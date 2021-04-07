@@ -1,0 +1,174 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+  <!-- <base href="/dashboard/"> -->
+  <script type="text/javascript" src="config.js"></script>
+
+  <link rel="manifest" href="site.webmanifest">
+  <!-- Place favicon.ico in the root directory -->
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Add your site or application content here -->
+  <!-- Navbar -->
+  <div class="navbar-background">
+    <div class="container">
+      <div class="d-flex flex-row">
+        <div class="mr-auto">
+          <div class="brand-name"><a href="./index.html" class="nounderline brand-name" id="branding">
+            </a>
+            <small class="version">
+              V
+              <span id="version"></span>
+            </small>
+          </div>
+
+        </div>
+        <div>
+          <a href="./setting.html"><button type="button" class="btn settings-button setting-text">
+              <i class="fas fa-cog settings-icon"></i>
+              SETTINGS
+            </button>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="colored-section"></div> -->
+
+<!-- Cards section -->
+
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12 bor">
+          <div class=" card-section-a">
+            <div class="card-body" id="">
+              <div class="text-right">
+                <!-- <i class="fa fa-key font-icon"></i> -->
+              </div>
+              <h6 class="card-text"> LICENSES ISSUED</h6>
+              <h6 class="card-info" id="card1">
+                <a id="card1">-/-
+              </h6>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
+          <div class="card-section-b">
+            <div class="card-body card-text card-text" id="">
+              <div class="text-right">
+                <!-- <i class="fa fa-clock font-icon"></i> -->
+              </div>
+              <h6>LEASE DURATION</h6>
+              <h6>
+                <i class="card-info" id="card2">.... <small>SECS</small>
+              </h6>
+              </i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
+          <div class="card-section-c">
+            <div class="card-body card-text" id="">
+              <div class="text-right">
+                <!-- <i class="fa fa-hourglass-start font-icon"></i> -->
+              </div>
+              <h6> EXPIRATION DATE</h6>
+              <h6>
+                <i class="card-info" id="card3">--:--:--
+              </h6>
+              </i>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 col-sm-12 col-xs-12">
+          <div class="card-section-d ">
+            <div class="card-body card-text" id="">
+              <div class="text-right">
+                <!-- <i class="fa fa-server font-icon"></i> -->
+              </div>
+              <h6> STATUS</h6>
+              <div id="cardStats">
+                <h6><i class="card-stats" id="card4">--</h6>
+                </i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<!-- Separator -->
+
+  <div class="section">
+    <div class="container">
+      <div class="row ">
+        <h5 class="divider-section">
+        </h5>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table section -->
+  <div class="container table-section">
+    <div id="toolbar">
+
+      <div class="hide-element">
+        <button id="remove" class="btn btn-danger" disabled>
+          <i class="fa fa-ban"></i> Revoke
+        </button>
+      </div>
+
+    </div>
+    <table id="table" data-toolbar="#toolbar" class="table table-striped">
+      <thead class="thead-dark"></thead>
+    </table>
+
+  </div>
+
+  <!-- Detail section -->
+  <div id="detailFormat" class="hide-element">
+    <p><label class="detail-section"><b id="detailFormatKey">
+          <a id="detailFcormatKey">:</label></b></a>
+      <a id="detailFormatValue">
+    </p></a>
+  </div>
+
+  <!-- Footer section -->
+  <div class="section footer-section mt-auto ">
+    <div class="container ">
+      <!-- <footer class="navbar navbar-default navbar-static-bottom "></footer> -->
+      <footer class=""></footer>
+      <p class="text-center">Copyright ©
+        <script type="text/javascript">
+          document.write(new Date().getFullYear());
+        </script>
+        <span id="copyright"></span>
+      </p>
+      </footer>
+
+    </div>
+  </div>
+
+</body>
+
+</html>

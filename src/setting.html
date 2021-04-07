@@ -1,0 +1,464 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta property="og:title" content="">
+    <meta property="og:type" content="">
+    <meta property="og:url" content="">
+    <meta property="og:image" content="">
+    <!-- <base href="/dashboard/"> -->
+    <script type="text/javascript" src="config.js"></script>
+
+    <link rel="manifest" href="site.webmanifest">
+    <!-- Place favicon.ico in the root directory -->
+
+
+    <meta name="theme-color" content="#fafafa">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- Add your site or application content here -->
+    <div class="navbar-background">
+        <div class="container">
+            <div class="d-flex flex-row">
+                <div class="mr-auto">
+                    <div class="brand-name"><a href="./index.html" class="nounderline brand-name" id="branding">
+                        </a>
+                        <small class="version">
+                            V
+                            <span id="version"></span>
+                        </small>
+                    </div>
+                </div>
+                <div>
+                    <a href="index.html"><button type="button" class="btn settings-button setting-text">
+                            <i class="fas fa-border-all dashboard-icon"></i>
+                            DASHBOARD
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="container">
+            <h3 class="settings-header">Settings</h3>
+        </div>
+    </div>
+
+<!-- Tabs section -->
+    <div class="section hide-element" id="activationTab">
+        <div class="container">
+            <ul class="nav nav-tabs setting-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active tabs-text" aria-current="page" href="#">ACTIVATION</a>
+                </li>
+        </div>
+    </div>
+    <div class="section hide-element" id="deactivationTab">
+        <div class="container">
+            <ul class="nav nav-tabs setting-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active tabs-text" aria-current="page" href="#">DE-ACTIVATION</a>
+                </li>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="container">
+            <div class="card online-activation-card">
+                <div class="card-body">
+                    
+                    <!--online Activation -->
+                    <div id="onlineActivationUi" class="hide-element">
+                        <div class="d-flex flex-row bd-highlight">
+                            <div class="bd-highlight activation-card-heading mr-auto">Online Activation</div>
+                            <div class="online-stats-text bd-highlight">Server Status</div>
+                            <div class="online-deactive-stats bd-high">
+                                <div class="stats-text">De-Activated</div>
+                            </div>
+                        </div>
+                        <form id="activateOnline">
+                            <div class="form align-items-center">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control licensekey-section" id="keyOnline"
+                                            placeholder="License Key" name="licenseKey" required>
+                                        <small id="activationHelp" class="form-text text-muted">Enter your license
+                                            key</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-row">
+                                <div class="redirecting-link mr-auto" id="switchToOffActivation">
+                                    <a href="#">SWITCH TO OFFLINE ACTIVATION</a>
+                                </div>
+                                <div id="mainBtn"><button type="submit"
+                                        class="btn affirmative-button activate-btn disabled-btn" id="activate"><i
+                                            class="fas fa-toggle-on dashboard-icon"></i> Activate</button>
+                                </div>
+                                <div class="hide-element" id="activatingBtn"><button type="button"
+                                        class="btn affirmative-button activate-btn disabled-btn"
+                                        id="activating">Activating...</button></div>
+                            </div>
+                        </form>
+                        <!-- Response section starts -->
+
+                        <div id="onlineMsgSuccessDeactivate" class="response-section hide-element">
+                            <div class="alert alert-success alert-dismissible" role="alert">
+                                <button type="button" class="close cross-margin" data-dismiss="alert">&times;</button>
+                                <h6 class="response-text">Server Deactivated Successfully!</h6>
+                            </div>
+                        </div>
+                        <div id="onlineMsgFailActivate" class="response-section hide-element">
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <button type="button" class="close cross-margin" data-dismiss="alert">&times;</button>
+                                <h6 class="response-text">Server Activation Failed!</h6>
+                            </div>
+                        </div>
+                        <!-- Response section ends -->
+
+                    </div>
+                    <!-- Online Activation ends -->
+
+                    <!-- Online Deactivation starts-->
+                    <div class="hide-element" id="onlineDeactivationUi">
+                        <div class="d-flex flex-row bd-highlight">
+                            <div class="bd-highlight deactivation-card-heading mr-auto">Online De-Activation</div>
+                            <div class="online-stats-text bd-highlight">Server Status</div>
+                            <div class="online-active-stats bd-high">
+                                <div class="stats-text">Activated</div>
+                            </div>
+                        </div>
+                        <form id="deactivateOnline">
+                            <div class="form align-items-center">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control licensekey-section"
+                                            id="keyOnlineDeactivation" placeholder="License Key" name="licenseKey"
+                                            required>
+                                        <small id="activationHelp" class="form-text text-muted">Enter your license
+                                            key</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-text">
+                                <small id="deactAgree" class="warning-text">Pressing the button will effectively
+                                    deactivate this <p>server.</p>
+                                    <!-- <p class="warning-red">Warning: This will delete all the stats.</p> -->
+                                </small>
+                            </div>
+                            <div class="form-check check spacing">
+                                <input type="checkbox" class="form-check-input" id="deactivationConsent" required>
+                                <label class="form-check-label" for="deactivationConsent"><small>I have read the above
+                                        disclaimer and wish to proceed</small></label>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div class="redirecting-link mr-auto" id="switchToOffDeactivation">
+                                    <a href="#">SWITCH TO OFFLINE DE-ACTIVATION</a>
+                                </div>
+                                <div id="deactivate"><button type="submit"
+                                        class="btn deactivation-btn activate-btn disabled-btn" id="deactivateBtn">
+                                        <i class="fas fa-toggle-off dashboard-icon "></i> Deactivate</button>
+                                </div>
+                                <div id="deactivatingBtn" class="hide-element"><button type="button"
+                                        class="btn deactivation-btn activate-btn disabled-btn"
+                                        id="deactivating">Deactivating...</button>
+                                </div>
+                            </div>
+                        </form>
+                        <!-- Response section for deactivation starts -->
+
+                        <div id="onlineMsgFailDeactivate" class="response-section hide-element">
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <button type="button" class="close cross-margin" data-dismiss="alert">&times;</button>
+                                <h6 class="response-text">Server Deactivation Failed!</h6>
+                            </div>
+                        </div>
+                        <div id="onlineMsgSuccessActivate" class="response-section hide-element">
+                            <div class="alert alert-success alert-dismissible" role="alert">
+                                <button type="button" class="close cross-margin" data-dismiss="alert">&times;</button>
+                                <h6 class="response-text">Server Activated Successfully!</h6>
+                            </div>
+                        </div>
+
+
+
+                        <!-- Response section for deactivation ends -->
+                    </div>
+                    <!-- Online Deactivation ends -->
+
+                    <!-- Offline Activatin Step1 Starts -->
+                    <div class="hide-element" id="offlineActivationUiOne">
+                        <div class="d-flex flex-row bd-highlight">
+                            <div class="bd-highlight card-heading mr-auto">Offline Activation</div>
+                            <div class="online-stats-text bd-highlight">Server Status</div>
+                            <div class="online-deactive-stats bd-high">
+                                <div class="stats-text">De-Activated</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="bullets-colored numbering"> <small class="numbering">1</small> </div>
+                            <div class="progress-link-colored mr-auto">
+                                <a href="#">GENERATE REQUEST</a>
+                            </div>
+                            <div class="next-step"> > </div>
+                            <div class="bullets-muted numbering"> <small class="numbering">2</small> </div>
+                            <div class="progress-link progress-link2">
+                                <a href="#" id="progressLink" class="progress-link progress-link2">ENTER ACTIVATION
+                                    RESPONSE</a>
+                            </div>
+                        </div>
+                        <form id="offlineActivationstep1">
+                            <div class="offline-activation">
+                                <div class="col-lg-7">
+                                    <input type="text" class="form-control licensekey-section-offline" id="keyToGen"
+                                        placeholder="License Key" name="licenseKey" required>
+                                    <small id="activationHelp" class="form-text text-muted">Enter your license
+                                        key</small>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-row">
+                                <div class="redirecting-link extra-margin mr-auto" id="switchToOnlineActivation">
+                                    <a href="#">SWITCH TO ONLINE ACTIVATION</a>
+                                </div>
+                                <div id="nextStep">
+                                    <button type="submit" class="btn next-btn simple-button" id="nextBtn">NEXT</button>
+                                </div>
+
+                            </div>
+                        </form>
+
+
+                    </div>
+                    <!-- Offline Activation Step 1 Ends -->
+
+                    <!-- Offline Activation Step 2 Starts -->
+                    <div class="hide-element" id="offlineActivationUiTwo">
+                        <div class="d-flex flex-row bd-highlight">
+                            <div class="bd-highlight card-heading mr-auto">Offline Activation</div>
+                            <div class="online-stats-text bd-highlight">Server Status</div>
+                            <div class="online-deactive-stats bd-high">
+                                <div class="stats-text">De-Activated</div>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row">
+                            <div class="bullets-colored numbering"> <small class="numbering">1</small> </div>
+                            <div class="progress-link mr-auto">
+                                <a href="#">GENERATE REQUEST</a>
+                            </div>
+                            <div class="next-step"> > </div>
+                            <div class="bullets-colored numbering"> <small class="numbering">2</small> </div>
+                            <div class="progress-link-colored progress-link2">
+                                <a href="#" class="progress-link-colored progress-link2" id="offlineStep2">ENTER
+                                    ACTIVATION RESPONSE</a>
+                            </div>
+                        </div>
+                        <form id="offlineActivationStep2">
+                            <div class="offline-activation">
+                                <div class="col-lg-7">
+                                    <input type="text" class="form-control licensekey-section-offline" id="offlineKey"
+                                        placeholder="License Key" name="licenseKey" required>
+                                    <small id="activationHelp" class="form-text text-muted">Enter your license
+                                        key</small>
+                                </div>
+                            </div>
+
+                            <div id="generate">
+                                <div><a href="#" id="generateBtn" class="download-req-file">DOWNLOAD REQUEST FILE</a>
+                                </div>
+                            </div>
+
+                            <!-- Response section for offline activation starts -->
+
+                            <div id="offlineMsgSuccess1" class="response-section hide-element">
+                                <div class="alert alert-success alert-dismissible fade show">
+                                    <button type="button" class="close cross-margin"
+                                        data-dismiss="alert">&times;</button>
+                                    <h6 class="response-text">Offline Activation Request generated successfully!</h6>
+                                </div>
+                            </div>
+                            <div id="offlineMsgFail1" class="response-section hide-element">
+                                <div class="alert alert-danger alert-dismissible fade show">
+                                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                    <h6>Failed to generate Offline Activation Request!</h6>
+                                </div>
+                            </div>
+
+                            <!-- Response section for offline activation ends -->
+
+                            <div class="col-lg-7" id="">
+                                <textarea class="form-control licensekey-section" id="responseFile"
+                                    name="offlineResponse" rows="3" required></textarea>
+                                <small id="activationHelp" class="form-text text-muted">Enter the offline activation
+                                    response
+                                </small>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div class="redirecting-link extra-margin mr-auto" id="switchToOnlineActivation2">
+                                    <a href="#">SWITCH TO ONLINE ACTIVATION</a>
+                                </div>
+
+                                <div>
+                                    <button type="button" class="btn next-btn previous-btn simple-button"
+                                        id="previousBtn">PREVIOUS</button>
+                                </div>
+                                <div>
+                                    <button type="submit" class="btn affirmative-button activate-btn disabled-btn"
+                                        id="activateOffline"><i class="fas fa-toggle-on dashboard-icon"></i>
+                                        Activate</button>
+                                </div>
+                                <div class="hide-element">
+                                    <button type="button" class="btn affirmative-button activate-btn disabled-btn"
+                                        id="activatingOffline">Activating...</button>
+                                </div>
+
+                            </div>
+                        </form>
+                        <!-- Response section for offline activation starts -->
+
+
+                        <div id="offlineMsgFail2" class="response-section hide-element">
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <button type="button" class="close cross-margin" data-dismiss="alert">&times;</button>
+                                <h6 class="response-text">Offline Activation Failed!</h6>
+                            </div>
+                        </div>
+                        <!-- Response section for offline activation ends -->
+
+                    </div>
+                    <!-- Offline Activation Step 2 ends -->
+
+                    <!-- Offline De-Activation starts -->
+
+                    <div class="hide-element" id="offlineDeactivationUi">
+                        <div class="d-flex flex-row bd-highlight">
+                            <div class="bd-highlight deactivation-card-heading mr-auto">Offline De-Activation</div>
+                            <div class="online-stats-text bd-highlight">Server Status</div>
+                            <div class="online-active-stats bd-high">
+                                <div class="stats-text">Activated</div>
+                            </div>
+                        </div>
+                        <form id="deactivateOffline">
+                            <div class="form align-items-center">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control licensekey-section"
+                                            id="deactivationKeyOffline" placeholder="License Key" name="licenseKey"
+                                            required>
+                                        <small id="activationHelp" class="form-text text-muted">Enter your license
+                                            key</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-text">
+                                <small id="deactAgree" class="warning-text">Pressing the button will effectively
+                                    deactivate this <p>server.</p>
+                                    <!-- <p class="warning-red">Warning: This will delete all the stats.</p> -->
+                                </small>
+                            </div>
+                            <div class="form-check check spacing">
+                                <input type="checkbox" class="form-check-input" id="deactivationConsentOffline"
+                                    required>
+                                <label class="form-check-label" for="deactivationConsentOffline"><small>I have read the
+                                        above disclaimer and wish to proceed</small></label>
+                            </div>
+                            <div class="d-flex flex-row">
+                                <div class="redirecting-link mr-auto" id="switchToOnlineDeactivation">
+                                    <a href="#">SWITCH TO ONLINE DE-ACTIVATION</a>
+                                </div>
+                                <!-- id="deactivateOfflineUi -->
+                                <div><button type="submit" class="btn deactivation-btn activate-btn disabled-btn"
+                                        id="deactivationGenerateBtn"><i class="fas fa-toggle-off dashboard-icon "></i>
+                                        DEACTIVATE</button></div>
+
+                                <div id="deactivatingGen" class="hide-element"><button type="button"
+                                        class="btn deactivation-btn activate-btn disabled-btn"
+                                        id="deactivating123">Deactivating...
+                                    </button></div>
+                            </div>
+                        </form>
+
+
+                        <!-- Response section for offline deactivation starts -->
+                        <div id="offlineMsgFailForDeactivation" class="response-section hide-element">
+                            <div class="alert alert-danger alert-dismissible fade show">
+                                <button type="button" class="close cross-margin" data-dismiss="alert">&times;</button>
+                                <h6 class="response-text">Failed to generate Offline Deactivation Request!</h6>
+                            </div>
+                        </div>
+                        <div id="offlineMsgSuccess2" class="response-section hide-element">
+                            <div class="alert alert-success alert-dismissible fade show">
+                                <button type="button" class="close cross-margin" data-dismiss="alert">&times;</button>
+                                <h6 class="response-text">Offline Activation done successfully!</h6>
+                            </div>
+                        </div>
+                        <!-- Response section for offline deactivation ends -->
+                    </div>
+
+                    <!-- Offline De-Activation ends -->
+
+                    <div class="hide-element" id="offlineDeactivationGuide">
+                        <div class="d-flex flex-row bd-highlight">
+                            <div class="bd-highlight card-heading mr-auto">Offline De-Activation</div>
+                            <div class="online-stats-text bd-highlight">Server Status</div>
+                            <div class="online-deactive-stats bd-high">
+                                <div class="stats-text">De-Activated</div>
+                            </div>
+                        </div>
+                        <div class="info-text">
+                            <small>
+                                <p><b>Note:</b>Your deactivation request has been registered locally.</p>
+                                <!-- <p> Use the link below to download your deactivation</p><p>request file.</p> -->
+                            </small>
+
+                        </div>
+                        <div class="redirecting-link mr-auto" id="switchToOffActivation2">
+                            <a href="#">SWITCH TO OFFLINE ACTIVATION</a>
+                        </div>
+                        <!-- <div class="redirecting-link" id="deactivateGen">
+                            <a href="#">DOWNLOAD DEACTIVATION REQUEST</a>
+                        </div> -->
+                        <div id="offlineMsgSuccessForDeactivation" class="response-section hide-element">
+                            <div class="alert alert-success alert-dismissible fade show">
+                                <button type="button" class="close cross-margin" data-dismiss="alert">&times;</button>
+                                <h6 class="response-text">Offline Deactivation Request downloaded successfully!</h6>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- Footer section -->
+    <div class="section footer-section mt-auto">
+        <div class="container ">
+            <footer class=""></footer>
+            <p class="text-center">Copyright ©
+                <script type="text/javascript">
+                    document.write(new Date().getFullYear());
+                </script>
+                <span id="copyright"></span>
+            </p>
+            </footer>
+
+        </div>
+    </div>
+</body>
+
+</html>
