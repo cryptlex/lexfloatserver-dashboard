@@ -19,7 +19,7 @@ jobs:
           npm run build
         
       - name: Zip files
-        run: zip dashboard.zip dist
+        run: zip -r dashboard.zip dist
 
       - name: Create Release
         id: create_release
