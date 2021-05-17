@@ -2,16 +2,28 @@ import jquery from "jquery";
 const $ = jquery
 import "bootstrap-table";
 import FileSaver from 'file-saver';
-// import jwt from "jsonwebtoken";
+import jwtDecode from "jwt-decode";
 import 'bootstrap-table';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '../sass/main.scss';
 import './config.js'
-var jwt = require('jsonwebtoken');
 
 let deactivationkey;
+
+function isTokenValid() {
+    try {
+        const timestamp = Math.floor((new Date()).getTime() / 1000);
+        const accessToken = localStorage.getItem("token"); // rename to accessToken
+        if (token == "" || jwtDecode(accessToken).exp < timestamp) {
+            return false;
+        }
+        return true;
+    } catch {
+        return false;
+    }
+}
 
 $(document).ready(function () {
     // debugger;
@@ -83,7 +95,7 @@ $(document).ready(function () {
 
         // url: "./stats.json",
         url: "http://localhost:8090/api/server/stats",
-        headers: { Authorization: 'Bearer '+localStorage.getItem("token") },
+        headers: { Authorization: 'Bearer ' + localStorage.getItem("token") },
         method: 'GET',
         success: function (data) {
             let card1 = (data.totalLicenses - data.availableLicenses) + '/' + data.totalLicenses
@@ -173,7 +185,7 @@ $(document).ready(function () {
         $remove.prop('disabled', true)
     })
 
- 
+
     $("#switchToOffActivation").click(function () {
         $("#onlineActivationUi").addClass("hide-element");
         $("#offlineActivationUiOne").removeClass("hide-element");
@@ -190,7 +202,7 @@ $(document).ready(function () {
 
     });
 
-    
+
     $("#switchToOnlineActivation2").click(function () {
         $("#offlineActivationUiTwo").addClass("hide-element");
         $("#onlineActivationUi").removeClass("hide-element");
@@ -239,7 +251,7 @@ $(document).ready(function () {
         {
             url: "http://localhost:8090/api/floating-licenses",
             // url: './activations.json',
-            ajaxOptions: { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("token") }},
+            ajaxOptions: { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("token") } },
             onPreBody: dataFormatter,
             // onExpandRow: row,
             columns: [
@@ -287,11 +299,11 @@ $(document).ready(function () {
     );
     // Login page
 
-    $("#loginBtn").submit(function(e){
+    $("#loginBtn").submit(function (e) {
 
         e.preventDefault();
         let url = "http://localhost:8090/api/login"
-        const credentials ={
+        const credentials = {
             userName: $("#userName").val(),
             password: $("#password").val()
         }
@@ -304,15 +316,15 @@ $(document).ready(function () {
         }).done(function (data) {
 
             // let token = JSON.parse(data)
-            localStorage.setItem("token",data.accessToken);
+            localStorage.setItem("token", data.accessToken);
             //redirect to the dashboard
-            location.href= "/app/index.html"
+            location.href = "/app/index.html"
 
         }).fail(function (data) {
 
             //redirect back to the login page
-            location.href="/app/login.html"
-        });   
+            location.href = "/app/login.html"
+        });
     });
 
     // Settings page online activation

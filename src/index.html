@@ -11,23 +11,22 @@
   <meta property="og:type" content="">
   <meta property="og:url" content="">
   <meta property="og:image" content="">
-  <base href= "/app/">
+  <!-- <base href= "/app/"> -->
   <script type="text/javascript" src="config.js"></script>
-  <script> 
-  jwt.verify(localStorage.getItem("token"), SECRET, (err, decoded) => {
-    if (!err) {
-        localStorage.clear();
-    }
-  });
-</script>
 
   <link rel="manifest" href="site.webmanifest">
   <!-- Place favicon.ico in the root directory -->
 
   <meta name="theme-color" content="#fafafa">
 </head>
-<body class="d-flex flex-column min-vh-100">
 
+<body class="d-flex flex-column min-vh-100">
+  <script>
+    if (!isTokenValid()) {
+      // token has expired redirect to login [age]
+      alert("expired3")
+    }
+  </script>
   <!-- Add your site or application content here -->
   <!-- Navbar -->
   <div class="navbar-background">
@@ -55,7 +54,7 @@
   </div>
   <!-- <div class="colored-section"></div> -->
 
-<!-- Cards section -->
+  <!-- Cards section -->
 
   <div class="section">
     <div class="container">
@@ -124,7 +123,7 @@
     </div>
   </div>
 
-<!-- Separator -->
+  <!-- Separator -->
 
   <div class="section">
     <div class="container">
