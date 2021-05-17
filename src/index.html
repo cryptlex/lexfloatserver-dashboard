@@ -11,8 +11,15 @@
   <meta property="og:type" content="">
   <meta property="og:url" content="">
   <meta property="og:image" content="">
-  <!-- <base href="/dashboard/"> -->
+  <base href= "/app/">
   <script type="text/javascript" src="config.js"></script>
+  <script> 
+  jwt.verify(localStorage.getItem("token"), SECRET, (err, decoded) => {
+    if (!err) {
+        localStorage.clear();
+    }
+  });
+</script>
 
   <link rel="manifest" href="site.webmanifest">
   <!-- Place favicon.ico in the root directory -->
@@ -27,7 +34,7 @@
     <div class="container">
       <div class="d-flex flex-row">
         <div class="mr-auto">
-          <div class="brand-name"><a href="./index.html" class="nounderline brand-name" id="branding">
+          <div class="brand-name"><a href="index.html" class="nounderline brand-name" id="branding">
             </a>
             <small class="version">
               V
@@ -37,7 +44,7 @@
 
         </div>
         <div>
-          <a href="./setting.html"><button type="button" class="btn settings-button setting-text">
+          <a href="setting.html"><button type="button" class="btn settings-button setting-text">
               <i class="fas fa-cog settings-icon"></i>
               SETTINGS
             </button>

@@ -16,6 +16,10 @@ module.exports = {
  
   plugins:[
     new HtmlWebpackPlugin({
+      template: "./src/login.html",
+      filename: "./login.html"
+  }),
+    new HtmlWebpackPlugin({
         template: "./src/index.html",
         filename: "./index.html"
     }),
@@ -54,5 +58,8 @@ module.exports = {
            }
           }, 
     ]
-  }
+  },
+  resolve: {
+    fallback: { crypto: false },
+}
 };

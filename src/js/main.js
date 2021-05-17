@@ -2,13 +2,14 @@ import jquery from "jquery";
 const $ = jquery
 import "bootstrap-table";
 import FileSaver from 'file-saver';
-import 'bootstrap';
+// import jwt from "jsonwebtoken";
 import 'bootstrap-table';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '../sass/main.scss';
 import './config.js'
+var jwt = require('jsonwebtoken');
 
 let deactivationkey;
 
@@ -73,7 +74,7 @@ $(document).ready(function () {
         }
 
     }
-
+    $("#companyName").html(Cryptlex.title);
     $("#branding").html(Cryptlex.title);
     $("#copyright").html(Cryptlex.footer)
 
@@ -82,6 +83,7 @@ $(document).ready(function () {
 
         // url: "./stats.json",
         url: "http://localhost:8090/api/server/stats",
+        headers: { Authorization: 'Bearer '+localStorage.getItem("token") },
         method: 'GET',
         success: function (data) {
             let card1 = (data.totalLicenses - data.availableLicenses) + '/' + data.totalLicenses
@@ -237,6 +239,7 @@ $(document).ready(function () {
         {
             url: "http://localhost:8090/api/floating-licenses",
             // url: './activations.json',
+            ajaxOptions: { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("token") }},
             onPreBody: dataFormatter,
             // onExpandRow: row,
             columns: [
@@ -282,6 +285,35 @@ $(document).ready(function () {
 
         }
     );
+    // Login page
+
+    $("#loginBtn").submit(function(e){
+
+        e.preventDefault();
+        let url = "http://localhost:8090/api/login"
+        const credentials ={
+            userName: $("#userName").val(),
+            password: $("#password").val()
+        }
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: JSON.stringify(credentials),
+            contentType: "application/json; charset=utf-8",
+            dataType: "json"
+        }).done(function (data) {
+
+            // let token = JSON.parse(data)
+            localStorage.setItem("token",data.accessToken);
+            //redirect to the dashboard
+            location.href= "/app/index.html"
+
+        }).fail(function (data) {
+
+            //redirect back to the login page
+            location.href="/app/login.html"
+        });   
+    });
 
     // Settings page online activation
 
