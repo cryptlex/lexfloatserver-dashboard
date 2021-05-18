@@ -22,9 +22,12 @@
 
 <body class="d-flex flex-column min-vh-100">
   <script>
-    if (!isTokenValid()) {
+    if (isTokenValid()) {
       // token has expired redirect to login [age]
-      alert("expired3")
+      location.href = "/app/index.html" 
+    }
+    else{
+      location.href = "/login.html"
     }
   </script>
   <!-- Add your site or application content here -->

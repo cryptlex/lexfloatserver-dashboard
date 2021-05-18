@@ -318,12 +318,12 @@ $(document).ready(function () {
             // let token = JSON.parse(data)
             localStorage.setItem("token", data.accessToken);
             //redirect to the dashboard
-            location.href = "/app/index.html"
+            // location.href = "/app/index.html"// /app
 
         }).fail(function (data) {
 
             //redirect back to the login page
-            location.href = "/app/login.html"
+            location.href = "/login.html"
         });
     });
 
