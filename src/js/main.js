@@ -25,6 +25,11 @@ function isTokenValid() {
     }
 }
 
+if (!isTokenValid() && !location.href.includes("login")) {
+    // token has expired redirect to login [age]
+    location.href = "/login.html"
+}
+
 $(document).ready(function () {
     // debugger;
     var $table = $('#table')
