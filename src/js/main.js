@@ -10,24 +10,29 @@ import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '../sass/main.scss';
 import './config.js'
 
+
 let deactivationkey;
 
 function isTokenValid() {
     try {
         const timestamp = Math.floor((new Date()).getTime() / 1000);
-        const accessToken = localStorage.getItem("token"); // rename to accessToken
-        if (token == "" || jwtDecode(accessToken).exp < timestamp) {
+        const accessToken = localStorage.getItem("accessToken"); // rename to accessToken
+        // console.log(jwtDecode(accessToken).exp);
+        // console.log(timestamp);
+        if (accessToken == "" || jwtDecode(accessToken).exp < timestamp) {
+            
             return false;
         }
         return true;
-    } catch {
+    } catch(err) {
+        console.log("Error while decoding:",err);
         return false;
     }
 }
 
 if (!isTokenValid() && !location.href.includes("login")) {
     // token has expired redirect to login [age]
-    location.href = "/login.html"
+    location.href = "login.html"
 }
 
 $(document).ready(function () {
@@ -91,6 +96,12 @@ $(document).ready(function () {
         }
 
     }
+    function checkStatus(status){
+        if(status == 401 && !location.href.includes("login")){
+            // console.log("yes 401")
+            location.href = "login.html"
+          }
+    }
     $("#companyName").html(Cryptlex.title);
     $("#branding").html(Cryptlex.title);
     $("#copyright").html(Cryptlex.footer)
@@ -99,10 +110,11 @@ $(document).ready(function () {
     $.ajax({
 
         // url: "./stats.json",
-        url: "http://localhost:8090/api/server/stats",
-        headers: { Authorization: 'Bearer ' + localStorage.getItem("token") },
+        url: "/api/server/stats",
+        headers: { Authorization: 'Bearer ' + localStorage.getItem("accessToken") },
         method: 'GET',
-        success: function (data) {
+        // success: function (data) {
+        }).done(function (data) {
             let card1 = (data.totalLicenses - data.availableLicenses) + '/' + data.totalLicenses
             $("#card1").html(card1);
             let card2 = data.leaseDuration + ' <small>SECS</small>'
@@ -132,9 +144,14 @@ $(document).ready(function () {
             let version = data.version
             $("#version").html(version);
 
+        }).fail(function (data) {
+            // console.log(data.status);
+            checkStatus(data.status);
+            
+        });
 
-        }
-    });
+        
+    // });
 
     function detail(index, row, $detail) {
         debugger;
@@ -254,9 +271,22 @@ $(document).ready(function () {
     // table.....
     let table = $('#table').bootstrapTable(
         {
-            url: "http://localhost:8090/api/floating-licenses",
+            url: "/api/floating-licenses",
             // url: './activations.json',
-            ajaxOptions: { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("token") } },
+            ajaxOptions: { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") }
+        
+            // beforeSend: function () {
+            //     console.log("before send");
+            // }
+        },
+            onLoadSuccess: function (status) {
+                // console.log("success floating") //ajax success
+            },
+            onLoadError: function (status) {
+                // console.log("fail floating..") 
+                checkStatus(status)
+                 
+            },
             onPreBody: dataFormatter,
             // onExpandRow: row,
             columns: [
@@ -307,7 +337,7 @@ $(document).ready(function () {
     $("#loginBtn").submit(function (e) {
 
         e.preventDefault();
-        let url = "http://localhost:8090/api/login"
+        let url = "/api/login"
         const credentials = {
             userName: $("#userName").val(),
             password: $("#password").val()
@@ -321,14 +351,14 @@ $(document).ready(function () {
         }).done(function (data) {
 
             // let token = JSON.parse(data)
-            localStorage.setItem("token", data.accessToken);
+            localStorage.setItem("accessToken", data.accessToken);
             //redirect to the dashboard
-            // location.href = "/app/index.html"// /app
+            location.href = "index.html"// /app
 
         }).fail(function (data) {
 
             //redirect back to the login page
-            location.href = "/login.html"
+            location.href = "login.html"
         });
     });
 
@@ -341,7 +371,7 @@ $(document).ready(function () {
         $("#activatingBtn").removeClass("hide-element");
         $("#activating").prop('disabled', true);
 
-        let url = "http://localhost:8090/api/server/activate"
+        let url = "/api/server/activate"
         const activationkey = {
             licenseKey: $("#keyOnline").val()
         };
@@ -379,7 +409,7 @@ $(document).ready(function () {
         $("#deactivatingBtn").removeClass("hide-element");
         $("#deactivating").prop('disabled', true);
 
-        let url = "http://localhost:8090/api/server/deactivate"
+        let url = "/api/server/deactivate"
         const activationkey = {
             licenseKey: $("#keyOnlineDeactivation").val()
 
@@ -416,7 +446,7 @@ $(document).ready(function () {
     $("#generateBtn").click(function (e) {
         //  debugger;
         e.preventDefault();
-        let url = "http://localhost:8090/api/server/offline-activation-request"
+        let url = "/api/server/offline-activation-request"
         const activationkey = {
             licenseKey: $("#keyToGen").val()
 
@@ -446,7 +476,7 @@ $(document).ready(function () {
         $("#activateOffline").addClass("hide-element");
         $("#activatingOffline").removeClass("hide-element");
         $("#activatingOffline").prop('disabled', true);
-        let url = "http://localhost:8090/api/server/offline-activate"
+        let url = "/api/server/offline-activate"
         const activationkey = {
             licenseKey: $("#offlineKey").val(),
             offlineResponse: $("#responseFile").val()
@@ -488,7 +518,7 @@ $(document).ready(function () {
         $("#deactivationGenerateBtn").addClass("hide-element");
         $("#deactivatingGen").removeClass("hide-element");
         $("#deactivating123").prop('disabled', true);
-        let url = "http://localhost:8090/api/server/offline-deactivate"
+        let url = "/api/server/offline-deactivate"
         deactivationkey = {
             licenseKey: $("#deactivationKeyOffline").val()
 

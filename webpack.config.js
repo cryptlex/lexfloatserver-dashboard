@@ -14,7 +14,7 @@ module.exports = {
   },
   output: {
     filename: '[name].[hash].js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'dist/app'),
   },
 
   plugins: [
@@ -22,23 +22,21 @@ module.exports = {
       template: "./src/login.html",
       filename: "./login.html",
       scriptLoading: "blocking",
-      base: "/app/"
-      // chunks: "main_head"
+      chunks: "main_head"
     }),
     new HtmlWebpackPlugin({
       template: "./src/index.html",
       filename: "./index.html",
       scriptLoading: "blocking",
-      base: "/app/"
-      // chunks: "main_head"
+      chunks: "main_head"
     }),
     new HtmlWebpackPlugin({
       template: "./src/setting.html",
       filename: "./setting.html",
       scriptLoading: "blocking",
-      base: "/app/"
-      // chunks: "main_head"
+      chunks: "main_head"
     }),
+    new HtmlWebpackInjector(),
     new CopyPlugin({
       patterns: [
         { from: "./src/js/config.js", to: "config.js" },
@@ -52,7 +50,7 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: "main.[hash].css",
     }),
-    new HtmlWebpackInjector()
+    
   ],
   module: {
     rules: [
