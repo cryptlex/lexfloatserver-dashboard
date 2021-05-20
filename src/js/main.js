@@ -9,6 +9,7 @@ import '@fortawesome/fontawesome-free/js/all.js';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '../sass/main.scss';
 import './config.js'
+import 'bootstrap/dist/js/bootstrap.bundle'
 
 
 let deactivationkey;
@@ -362,6 +363,10 @@ $(document).ready(function () {
         });
     });
     $("#logout").click(function(){
+        localStorage.clear();
+        location.href = "login.html"
+    })
+    $("#logoutSettingPage").click(function(){
         localStorage.clear();
         location.href = "login.html"
     })
