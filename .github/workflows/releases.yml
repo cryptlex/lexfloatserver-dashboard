@@ -1,8 +1,10 @@
+name: Release dashboard
+
 on:
   workflow_dispatch:
     inputs:
-      tagName:
-        description: 'Tag name'
+      version:
+        description: 'Version'
         required: true
         default: ''
         
@@ -29,8 +31,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.event.inputs.tagName }}
-          release_name: Release ${{ github.event.inputs.tagName }}
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: Release ${{ github.event.inputs.version }}
           draft: false
           prerelease: false
 
