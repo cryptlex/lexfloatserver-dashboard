@@ -142,6 +142,7 @@ $(document).ready(function () {
                 $("#activationTab").removeClass("hide-element");
             }
             let version = data.version
+            console.log(data.version);
             $("#version").html(version);
 
         }).fail(function (data) {
@@ -358,9 +359,15 @@ $(document).ready(function () {
         }).fail(function (data) {
 
             //redirect back to the login page
-            location.href = "login.html"
+            // location.href = "login.html"
+            // alert
+            $("#authenticationAlert").removeClass("hide-element");
         });
     });
+    $("#logout").click(function(){
+        localStorage.clear();
+        location.href = "login.html"
+    })
 
     // Settings page online activation
 

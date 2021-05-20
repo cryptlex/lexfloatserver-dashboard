@@ -44,16 +44,24 @@
                 <input type="text" placeholder="Username" class="username" required id="userName">
                 <input type="text" placeholder="Password" class="username" required id="password">
                 <div>
-                    <button class="btn login-btn " type="submit" >
+                    <button class="btn login-btn " type="submit">
                         <!-- <i class="fas fa-sign-in-alt dashboard-icon"></i> -->
                         Login
                     </button>
                 </div>
+                <!-- <div id="checkbox" class="hide-element">
                 <div class="d-flex flex-row checkbox-placement">
                 <div class="form-check check checkbox-margin">
-                    <input type="checkbox" class="form-check-input "  required>
+                    <input type="checkbox" class="form-check-input ">
                     <label class="form-check-label" for="RememberMe"><small>Remember Me</small></label>
                 </div>
+                </div>
+                </div> -->
+                <div id="authenticationAlert" class="login-alert hide-element">
+                    <div class="alert alert-danger alert-dismissible" role="alert">
+                        <button type="button" class="close login-alert-cross" data-dismiss="alert">&times;</button>
+                        <h6 class="response-text-login">Authentication failed</h6>
+                    </div>
                 </div>
                 </div>
             </form>

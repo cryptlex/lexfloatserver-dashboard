@@ -390,6 +390,17 @@ margin-bottom: 40px;
 .checkbox-text{
  color: #757575;
 }
+.login-alert{
+  max-width: 280px;
+  margin-left: 49px;
+}
+.response-text-login{
+  margin-bottom: -4px;
+  margin-top: -1px;
+}
+.login-alert-cross{
+  margin-top: -6px;
+}
 .card-footer1{
   padding: 1.25rem 1.25rem;
   // background-color: rgba(0,0,0,.03);
@@ -454,6 +465,23 @@ mix-blend-mode: normal;
 }
 
 .settings-icon:hover{
+  align-items: stretch;
+}
+.logout-btn{
+  background: #00296B;
+  border-radius: 4px;
+  font-size: px;
+  padding-top: 8px;
+  padding-bottom: 0px;
+  margin-top: 7.5px;
+  margin-left: 20px;
+}
+.logout-icon{
+  font-size: 16px;
+  color: white;
+  margin-bottom: 3px;
+}
+.logout-icon:hover{
   align-items: stretch;
 }
 .disabled-btn:hover{
