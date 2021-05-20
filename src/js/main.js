@@ -17,15 +17,12 @@ function isTokenValid() {
     try {
         const timestamp = Math.floor((new Date()).getTime() / 1000);
         const accessToken = localStorage.getItem("accessToken"); // rename to accessToken
-        // console.log(jwtDecode(accessToken).exp);
-        // console.log(timestamp);
         if (accessToken == "" || jwtDecode(accessToken).exp < timestamp) {
             
             return false;
         }
         return true;
-    } catch(err) {
-        console.log("Error while decoding:",err);
+    } catch {
         return false;
     }
 }
