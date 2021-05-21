@@ -468,7 +468,7 @@ $(document).ready(function () {
             dataType: "json"
         }).done(function (data) {
             var blob = new Blob([data.offlineRequest], { type: "text/plain;charset=utf-8" });
-            FileSaver.saveAs(blob, "activation request.txt");
+            FileSaver.saveAs(blob, "offline_activation_request.txt");
             $("#offlineMsgSuccess1").removeClass("hide-element");
 
         }).fail(function (data) {
@@ -541,7 +541,7 @@ $(document).ready(function () {
             dataType: "json"
         }).done(function (data) {
             var blob = new Blob([data.offlineRequest], { type: "text/plain;charset=utf-8" });
-            FileSaver.saveAs(blob, "deactivation request.txt");
+            FileSaver.saveAs(blob, "offline_deactivation_request.txt");
 
             $("#offlineMsgSuccessForDeactivation").removeClass("hide-element");
             $("#offlineDeactivationUi").addClass("hide-element");
