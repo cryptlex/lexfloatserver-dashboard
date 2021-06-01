@@ -174,9 +174,11 @@ $(document).ready(function () {
             html.push('<p><label class="detail-section"><b>' + `${key}` + ':</label></b> ' + `${value}` + '</p>')
         }
         html.push('<hr/><h5>Metadata</h5><hr/>')
+        if(row.metadata != null){
         for (let i = 0; i < row.metadata.length; i++) {
             html.push('<p><label class="metadata-section abc"><b>' + row.metadata[i].key + ':</b></label>' + row.metadata[i].value + '</p>')
         }
+    }
         html.push('</tbody>')
         return html.join('');
 

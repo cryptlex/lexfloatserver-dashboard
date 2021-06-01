@@ -336,8 +336,12 @@ mix-blend-mode: normal;
   color: #05a9e5
 }
 .detail-section{
-margin-top: 30px;
-margin-bottom: 40px;
+min-width: 200px;
+margin-top: 8px;
+margin-bottom: 8px;
+font-size: 15px;
+font-weight: 700;
+color: #555;
 }
 .username{
   min-width: 280px;
@@ -862,9 +866,7 @@ color: #4B84DE;
   padding-top: 30px;
   margin-bottom: 40px;
 }
-.detail-section{
-  min-width: 200px;
-}
+
 // .metadata-section{
 //   min-width: 200px;
 // }
