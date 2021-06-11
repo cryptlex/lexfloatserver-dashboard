@@ -139,8 +139,8 @@ $(document).ready(function () {
                 $("#card4").addClass("card-stats");
                 $("#activationTab").removeClass("hide-element");
             }
-            let version = data.version
-            console.log(data.version);
+            let version = "v"+data.version
+            // console.log(data.version);
             $("#version").html(version);
 
         }).fail(function (data) {
