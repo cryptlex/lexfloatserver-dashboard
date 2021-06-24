@@ -38,7 +38,7 @@ $(document).ready(function () {
     var $table = $('#table')
     var $remove = $('#remove')
     var selections = []
-    const ignoreProperties = ['index', 'id', '0', 'createdDate', 'lastUpdated', 'expiryDate', 'osVer', 'metadata']
+    const ignoreProperties = ['index', 'id', '0', 'createdDate', 'lastUpdated', 'expiryDate', 'osVer', 'metadata', 'meterAttributes']
     const timeProperties = ['createdAt', 'updatedAt', 'expiresAt']
     const abbrevationProperties = ['ip', 'os']
 
@@ -105,6 +105,23 @@ $(document).ready(function () {
     $("#copyright").html(Cryptlex.footer)
 
     // request for stats
+    function stats(){
+        $.ajax({
+         // url: "./stats.json",
+         url: "/api/server/stats",
+         headers: { Authorization: 'Bearer ' + localStorage.getItem("accessToken") },
+         method: 'GET',
+         // success: function (data) {
+         }).done(function (data) {
+             let card1 = (data.totalLicenses - data.availableLicenses) + '/' + data.totalLicenses
+             $("#card1").html(card1);
+             
+            }).fail(function (data) {
+                // console.log(data.status);
+                checkStatus(data.status);
+                
+            });
+        }
     $.ajax({
 
         // url: "./stats.json",
@@ -153,7 +170,7 @@ $(document).ready(function () {
     // });
 
     function detail(index, row, $detail) {
-        debugger;
+        // debugger;
         const html = [];
         const a = [];
         for (let prop in row) {
@@ -176,7 +193,7 @@ $(document).ready(function () {
         html.push('<hr/><h5>Metadata</h5><hr/>')
         if(row.metadata != null){
         for (let i = 0; i < row.metadata.length; i++) {
-            html.push('<p><label class="metadata-section abc"><b>' + row.metadata[i].key + ':</b></label>' + row.metadata[i].value + '</p>')
+            html.push('<p><label class="metadata-section detail-section abc"><b>' + row.metadata[i].key + ':</b></label>' + row.metadata[i].value + '</p>')
         }
     }
         html.push('</tbody>')
@@ -289,6 +306,8 @@ $(document).ready(function () {
                  
             },
             onPreBody: dataFormatter,
+
+            onRefresh: stats,
             // onExpandRow: row,
             columns: [
                 {
@@ -482,7 +501,7 @@ $(document).ready(function () {
     // settings page offline activation step 2 
 
     $("#offlineActivationStep2").submit(function (e) {
-        debugger;
+        // debugger;
         e.preventDefault();
         $("#activateOffline").addClass("hide-element");
         $("#activatingOffline").removeClass("hide-element");
