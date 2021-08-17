@@ -168,6 +168,15 @@ $(document).ready(function () {
 
 
     // });
+    function sortMetadata(a, b) {
+        if (a.key < b.key) {
+            return -1;
+        }
+        if (a.key > b.key) {
+            return 1;
+        }
+        return 0;
+    }
     function detail(index, row, $detail) {
         // debugger;
         const html = [];
@@ -191,8 +200,16 @@ $(document).ready(function () {
         }
         html.push('<hr/><h5>Metadata</h5><hr/>')
         if (row.metadata != null) {
-            for (let i = 0; i < row.metadata.length; i++) {
-                html.push('<p><label class="metadata-section detail-section abc"><b>' + row.metadata[i].key + ':</b></label>' + row.metadata[i].value + '</p>')
+            const sortable = row.metadata.sort(sortMetadata)
+
+            for (let i = 0; i < sortable.length; i++) {
+                if (sortable[i].key.includes("<")) {
+                    sortable[i].key = sortable[i].key.replace("<", "&lt;")
+                }
+                if (sortable[i].value.includes("<")) {
+                    sortable[i].value = sortable[i].value.replace('<', '&lt;');
+                }
+                html.push('<p><label class="metadata-section detail-section abc"><b>' + String((sortable[i].key)).toUpperCase() + ':</b></label>' + toTitleCase(sortable[i].value) + '</p>')
             }
         }
         html.push('</tbody>')
