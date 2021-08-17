@@ -19,7 +19,7 @@ function isTokenValid() {
         const timestamp = Math.floor((new Date()).getTime() / 1000);
         const accessToken = localStorage.getItem("accessToken"); // rename to accessToken
         if (accessToken == "" || jwtDecode(accessToken).exp < timestamp) {
-            
+
             return false;
         }
         return true;
@@ -94,34 +94,34 @@ $(document).ready(function () {
         }
 
     }
-    function checkStatus(status){
-        if(status == 401 && !location.href.includes("login")){
+    function checkStatus(status) {
+        if (status == 401 && !location.href.includes("login")) {
             // console.log("yes 401")
             location.href = "login.html"
-          }
+        }
     }
     $("#companyName").html(Cryptlex.title);
     $("#branding").html(Cryptlex.title);
     $("#copyright").html(Cryptlex.footer)
 
     // request for stats
-    function stats(){
+    function stats() {
         $.ajax({
-         // url: "./stats.json",
-         url: "/api/server/stats",
-         headers: { Authorization: 'Bearer ' + localStorage.getItem("accessToken") },
-         method: 'GET',
-         // success: function (data) {
-         }).done(function (data) {
-             let card1 = (data.totalLicenses - data.availableLicenses) + '/' + data.totalLicenses
-             $("#card1").html(card1);
-             
-            }).fail(function (data) {
-                // console.log(data.status);
-                checkStatus(data.status);
-                
-            });
-        }
+            // url: "./stats.json",
+            url: "/api/server/stats",
+            headers: { Authorization: 'Bearer ' + localStorage.getItem("accessToken") },
+            method: 'GET',
+            // success: function (data) {
+        }).done(function (data) {
+            let card1 = (data.totalLicenses - data.availableLicenses) + '/' + data.totalLicenses
+            $("#card1").html(card1);
+
+        }).fail(function (data) {
+            // console.log(data.status);
+            checkStatus(data.status);
+
+        });
+    }
     $.ajax({
 
         // url: "./stats.json",
@@ -129,46 +129,45 @@ $(document).ready(function () {
         headers: { Authorization: 'Bearer ' + localStorage.getItem("accessToken") },
         method: 'GET',
         // success: function (data) {
-        }).done(function (data) {
-            let card1 = (data.totalLicenses - data.availableLicenses) + '/' + data.totalLicenses
-            $("#card1").html(card1);
-            let card2 = data.leaseDuration + ' <small>SECS</small>'
-            $("#card2").html(card2);
+    }).done(function (data) {
+        let card1 = (data.totalLicenses - data.availableLicenses) + '/' + data.totalLicenses
+        $("#card1").html(card1);
+        let card2 = data.leaseDuration + ' <small>SECS</small>'
+        $("#card2").html(card2);
 
-            if (data.expiresAt != 0) {
-                let card3 = expirationDate(data.expiresAt)
-                $("#card3").html(card3);
-            }
-            let card4 = data.status
-            let card4Stats = card4.replace("_", " ");
-            $("#card4").html(card4Stats);
-            if (card4 === "ok") {
-                $("#onlineActivationUi").addClass("hide-element");
-                $("#onlineDeactivationUi").removeClass("hide-element");
-                $("#card4").removeClass("card-stats");
-                $("#card4").addClass("card-stats-ok");
-                $("#deactivationTab").removeClass("hide-element");
-            }
-            else {
-                $("#onlineDeactivationUi").addClass("hide-element");
-                $("#onlineActivationUi").removeClass("hide-element");
-                $("#card4").removeClass("card-stats-ok");
-                $("#card4").addClass("card-stats");
-                $("#activationTab").removeClass("hide-element");
-            }
-            let version = "v"+data.version
-            // console.log(data.version);
-            $("#version").html(version);
+        if (data.expiresAt != 0) {
+            let card3 = expirationDate(data.expiresAt)
+            $("#card3").html(card3);
+        }
+        let card4 = data.status
+        let card4Stats = card4.replace("_", " ");
+        $("#card4").html(card4Stats);
+        if (card4 === "ok") {
+            $("#onlineActivationUi").addClass("hide-element");
+            $("#onlineDeactivationUi").removeClass("hide-element");
+            $("#card4").removeClass("card-stats");
+            $("#card4").addClass("card-stats-ok");
+            $("#deactivationTab").removeClass("hide-element");
+        }
+        else {
+            $("#onlineDeactivationUi").addClass("hide-element");
+            $("#onlineActivationUi").removeClass("hide-element");
+            $("#card4").removeClass("card-stats-ok");
+            $("#card4").addClass("card-stats");
+            $("#activationTab").removeClass("hide-element");
+        }
+        let version = "v" + data.version
+        // console.log(data.version);
+        $("#version").html(version);
 
-        }).fail(function (data) {
-            // console.log(data.status);
-            checkStatus(data.status);
-            
-        });
+    }).fail(function (data) {
+        // console.log(data.status);
+        checkStatus(data.status);
 
-        
+    });
+
+
     // });
-
     function detail(index, row, $detail) {
         // debugger;
         const html = [];
@@ -191,11 +190,11 @@ $(document).ready(function () {
             html.push('<p><label class="detail-section"><b>' + `${key}` + ':</label></b> ' + `${value}` + '</p>')
         }
         html.push('<hr/><h5>Metadata</h5><hr/>')
-        if(row.metadata != null){
-        for (let i = 0; i < row.metadata.length; i++) {
-            html.push('<p><label class="metadata-section detail-section abc"><b>' + row.metadata[i].key + ':</b></label>' + row.metadata[i].value + '</p>')
+        if (row.metadata != null) {
+            for (let i = 0; i < row.metadata.length; i++) {
+                html.push('<p><label class="metadata-section detail-section abc"><b>' + row.metadata[i].key + ':</b></label>' + row.metadata[i].value + '</p>')
+            }
         }
-    }
         html.push('</tbody>')
         return html.join('');
 
@@ -291,19 +290,20 @@ $(document).ready(function () {
         {
             url: "/api/floating-licenses",
             // url: './activations.json',
-            ajaxOptions: { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") }
-        
-            // beforeSend: function () {
-            //     console.log("before send");
-            // }
-        },
+            ajaxOptions: {
+                headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") }
+
+                // beforeSend: function () {
+                //     console.log("before send");
+                // }
+            },
             onLoadSuccess: function (status) {
                 // console.log("success floating") //ajax success
             },
             onLoadError: function (status) {
                 // console.log("fail floating..") 
                 checkStatus(status)
-                 
+
             },
             onPreBody: dataFormatter,
 
@@ -383,11 +383,11 @@ $(document).ready(function () {
             $("#authenticationAlert").removeClass("hide-element");
         });
     });
-    $("#logout").click(function(){
+    $("#logout").click(function () {
         localStorage.clear();
         location.href = "login.html"
     })
-    $("#logoutSettingPage").click(function(){
+    $("#logoutSettingPage").click(function () {
         localStorage.clear();
         location.href = "login.html"
     })
