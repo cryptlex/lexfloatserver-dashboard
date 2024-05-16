@@ -15,9 +15,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2 
 
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+
       - name: Installing dependencies and build dashboard
         run: |
           npm install
+          npm audit fix --force
           npm run build
         
       - name: Zip files
