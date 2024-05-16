@@ -113,7 +113,7 @@ $(document).ready(function () {
             method: 'GET',
             // success: function (data) {
         }).done(function (data) {
-            let card1 = (data.totalLicenses - data.availableLicenses) + '/' + data.totalLicenses
+            let card1 = (data.totalFloatingClients) + '/' + data.allowedFloatingClients
             $("#card1").html(card1);
 
         }).fail(function (data) {
@@ -130,7 +130,7 @@ $(document).ready(function () {
         method: 'GET',
         // success: function (data) {
     }).done(function (data) {
-        let card1 = (data.totalLicenses - data.availableLicenses) + '/' + data.totalLicenses
+        let card1 = (data.totalFloatingClients) + '/' + data.allowedFloatingClients
         $("#card1").html(card1);
         let card2 = data.leaseDuration + ' <small>SECS</small>'
         $("#card2").html(card2);
