@@ -23,7 +23,6 @@ jobs:
       - name: Installing dependencies and build dashboard
         run: |
           npm install
-          npm audit fix --force
           npm run build
         
       - name: Zip files
