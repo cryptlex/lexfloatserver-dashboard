@@ -108,7 +108,7 @@ $(document).ready(function () {
     function stats() {
         $.ajax({
             // url: "./stats.json",
-            url: "/api/server/stats",
+            url: "api/server/stats",
             headers: { Authorization: 'Bearer ' + localStorage.getItem("accessToken") },
             method: 'GET',
             // success: function (data) {
@@ -125,7 +125,7 @@ $(document).ready(function () {
     $.ajax({
 
         // url: "./stats.json",
-        url: "/api/server/stats",
+        url: "api/server/stats",
         headers: { Authorization: 'Bearer ' + localStorage.getItem("accessToken") },
         method: 'GET',
         // success: function (data) {
@@ -305,7 +305,7 @@ $(document).ready(function () {
     // table.....
     let table = $('#table').bootstrapTable(
         {
-            url: "/api/floating-licenses",
+            url: "api/floating-licenses",
             // url: './activations.json',
             ajaxOptions: {
                 headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") }
@@ -374,7 +374,7 @@ $(document).ready(function () {
     $("#loginBtn").submit(function (e) {
 
         e.preventDefault();
-        let url = "/api/login"
+        let url = "api/login"
         const credentials = {
             userName: $("#userName").val(),
             password: $("#password").val()
@@ -418,7 +418,7 @@ $(document).ready(function () {
         $("#activatingBtn").removeClass("hide-element");
         $("#activating").prop('disabled', true);
 
-        let url = "/api/server/activate"
+        let url = "api/server/activate"
         const activationkey = {
             licenseKey: $("#keyOnline").val()
         };
@@ -456,7 +456,7 @@ $(document).ready(function () {
         $("#deactivatingBtn").removeClass("hide-element");
         $("#deactivating").prop('disabled', true);
 
-        let url = "/api/server/deactivate"
+        let url = "api/server/deactivate"
         const activationkey = {
             licenseKey: $("#keyOnlineDeactivation").val()
 
@@ -493,7 +493,7 @@ $(document).ready(function () {
     $("#generateBtn").click(function (e) {
         //  debugger;
         e.preventDefault();
-        let url = "/api/server/offline-activation-request"
+        let url = "api/server/offline-activation-request"
         const activationkey = {
             licenseKey: $("#keyToGen").val()
 
@@ -523,7 +523,7 @@ $(document).ready(function () {
         $("#activateOffline").addClass("hide-element");
         $("#activatingOffline").removeClass("hide-element");
         $("#activatingOffline").prop('disabled', true);
-        let url = "/api/server/offline-activate"
+        let url = "api/server/offline-activate"
         const activationkey = {
             licenseKey: $("#offlineKey").val(),
             offlineResponse: $("#responseFile").val()
@@ -565,7 +565,7 @@ $(document).ready(function () {
         $("#deactivationGenerateBtn").addClass("hide-element");
         $("#deactivatingGen").removeClass("hide-element");
         $("#deactivating123").prop('disabled', true);
-        let url = "/api/server/offline-deactivate"
+        let url = "api/server/offline-deactivate"
         deactivationkey = {
             licenseKey: $("#deactivationKeyOffline").val()
 
