@@ -11,9 +11,21 @@ import '../sass/main.scss';
 import './config.js'
 import 'bootstrap/dist/js/bootstrap.bundle'
 
+// ==================== CONSTANTS ====================
+const ACTIVATED_STATUSES = ['ok', 'expired', 'suspended', 'grace_period_over'];
+const STATUS_SECTIONS = [
+    'onlineActivationUi',
+    'onlineDeactivationUi',
+    'offlineActivationUiOne',
+    'offlineActivationUiTwo',
+    'offlineDeactivationUi',
+    'offlineDeactivationGuide'
+];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const IGNORE_PROPERTIES = ['index', 'id', '0', 'createdDate', 'lastUpdated', 'expiryDate', 'osVer', 'metadata', 'meterAttributes'];
+const TIME_PROPERTIES = ['createdAt', 'updatedAt', 'expiresAt'];
 
-let deactivationkey;
-
+// ==================== UTILITY FUNCTIONS ====================
 function isTokenValid() {
     try {
         const timestamp = Math.floor((new Date()).getTime() / 1000);
@@ -28,6 +40,119 @@ function isTokenValid() {
     }
 }
 
+function checkStatus(status) {
+    if (status == 401 && !location.href.includes("login")) {
+        location.href = "login.html"
+    }
+}
+
+function getAuthHeaders() {
+    return { Authorization: 'Bearer ' + localStorage.getItem("accessToken") };
+}
+
+function getAjaxConfig() {
+    return {
+        contentType: "application/json; charset=utf-8",
+        dataType: "json"
+    };
+}
+
+function toTitleCase(text) {
+    if (!text) return;
+    const titleCase = text.replace(/([A-Z]+)/g, ' $1').replace(/([A-Z][a-z])/g, ' $1');
+    return titleCase.charAt(0).toUpperCase() + titleCase.slice(1);
+}
+
+function formatDate(timestamp, includeTime = false) {
+    const d = new Date(timestamp * 1000);
+    const month = MONTHS[d.getMonth()];
+    const yyyy = d.getFullYear();
+    const mm = ('0' + (d.getMonth() + 1)).slice(-2);
+    const dd = ('0' + d.getDate()).slice(-2);
+    
+    if (!includeTime) {
+        return `${month}-${dd}-${yyyy}`;
+    }
+    
+    let hh = d.getHours();
+    let h = hh;
+    const min = ('0' + d.getMinutes()).slice(-2);
+    let ampm = 'AM';
+    
+    if (hh > 12) {
+        h = hh - 12;
+        ampm = 'PM';
+    } else if (hh === 12) {
+        h = 12;
+        ampm = 'PM';
+    } else if (hh == 0) {
+        h = 12;
+    }
+    
+    return `${month}-${dd}-${yyyy}, ${h}:${min} ${ampm}`;
+}
+
+// ==================== STATUS MANAGEMENT ====================
+let currentActivationStatus = false;
+
+function isActivatedStatus(status) {
+    return ACTIVATED_STATUSES.includes(String(status || '').toLowerCase());
+}
+
+function updateAllStatusBadges(isActivated) {
+    STATUS_SECTIONS.forEach(function(sectionId) {
+        const $badge = $('#' + sectionId).find('.online-active-stats, .online-deactive-stats');
+        if ($badge.length) {
+            $badge
+                .removeClass('online-active-stats online-deactive-stats')
+                .addClass(isActivated ? 'online-active-stats' : 'online-deactive-stats')
+                .find('.stats-text').text(isActivated ? 'Activated' : 'Not Activated');
+        }
+    });
+}
+
+function updateCard4Color(isActivated) {
+    if (isActivated) {
+        $("#card4").removeClass("card-stats").addClass("card-stats-ok");
+    } else {
+        $("#card4").removeClass("card-stats-ok").addClass("card-stats");
+    }
+}
+
+function updateActivationStatus(isActivated) {
+    currentActivationStatus = isActivated;
+    updateAllStatusBadges(isActivated);
+    updateCard4Color(isActivated);
+}
+
+// Function to update tab text based on activation status
+function updateTabText(isActivated) {
+    if (isActivated) {
+        $('#tabActivation').text('REACTIVATE');
+    } else {
+        $('#tabActivation').text('ACTIVATE');
+    }
+    // DEACTIVATE tab always stays the same
+}
+
+// ==================== UI HELPERS ====================
+function showElement(selector) {
+    $(selector).removeClass("hide-element");
+}
+
+function hideElement(selector) {
+    $(selector).addClass("hide-element");
+}
+
+function toggleElements(show, hide) {
+    if (Array.isArray(show)) show.forEach(s => showElement(s));
+    else if (show) showElement(show);
+    
+    if (Array.isArray(hide)) hide.forEach(s => hideElement(s));
+    else if (hide) hideElement(hide);
+}
+
+// ==================== MAIN CODE ====================
 if (!isTokenValid() && !location.href.includes("login")) {
     // token has expired redirect to login [age]
     location.href = "login.html"
@@ -38,567 +163,337 @@ $(document).ready(function () {
     var $table = $('#table')
     var $remove = $('#remove')
     var selections = []
-    const ignoreProperties = ['index', 'id', '0', 'createdDate', 'lastUpdated', 'expiryDate', 'osVer', 'metadata', 'meterAttributes']
-    const timeProperties = ['createdAt', 'updatedAt', 'expiresAt']
-    const abbrevationProperties = ['ip', 'os']
 
-    // timestamp= 0;
-    function expirationDate(timestamp) {
-        var d = new Date(timestamp * 1000),
-            months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            month = months[d.getMonth()],
-            yyyy = d.getFullYear(),
-            mm = ('0' + (d.getMonth() + 1)).slice(-2),	// Months are zero based. Add leading 0.
-            dd = ('0' + d.getDate()).slice(-2),	// Add leading 0.
-            time = month + '-' + dd + '-' + yyyy;
+    // Initialize branding
+    $("#companyName, #branding").html(Cryptlex.title);
+    $("#copyright").html(Cryptlex.footer);
 
-        return time;
-    }
-    function dateFormatter(timestamp) {
-
-        var d = new Date(timestamp * 1000),
-            months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            month = months[d.getMonth()],
-            yyyy = d.getFullYear(),
-            mm = ('0' + (d.getMonth() + 1)).slice(-2),	// Months are zero based. Add leading 0.
-            dd = ('0' + d.getDate()).slice(-2),	// Add leading 0.
-            hh = d.getHours(),
-            h = hh,
-            min = ('0' + d.getMinutes()).slice(-2),	// Add leading 0.
-            ampm = 'AM',
-            time
-
-        if (hh > 12) {
-            h = hh - 12;
-            ampm = 'PM';
-        } else if (hh === 12) {
-            h = 12;
-            ampm = 'PM';
-        } else if (hh == 0) {
-            h = 12;
-        }
-
-        // ie: 2013-02-18, 8:35 AM	
-        time = month + '-' + dd + '-' + yyyy + ', ' + h + ':' + min + ' ' + ampm;
-
-        return time;
-    }
+    // ==================== DATA FORMATTING ====================
     function dataFormatter(rows) {
-
-
-        for (let row of rows) {
-            row.createdDate = dateFormatter(row.createdAt);
-            row.lastUpdated = dateFormatter(row.updatedAt);
-            row.expiryDate = dateFormatter(row.expiresAt);
-            row.osVer = row.os + " " + row.osVersion;
-        }
-
-    }
-    function checkStatus(status) {
-        if (status == 401 && !location.href.includes("login")) {
-            // console.log("yes 401")
-            location.href = "login.html"
-        }
-    }
-    $("#companyName").html(Cryptlex.title);
-    $("#branding").html(Cryptlex.title);
-    $("#copyright").html(Cryptlex.footer)
-
-    // request for stats
-    function stats() {
-        $.ajax({
-            // url: "./stats.json",
-            url: "api/server/stats",
-            headers: { Authorization: 'Bearer ' + localStorage.getItem("accessToken") },
-            method: 'GET',
-            // success: function (data) {
-        }).done(function (data) {
-            let card1 = (data.totalFloatingClients) + '/' + data.allowedFloatingClients
-            $("#card1").html(card1);
-
-        }).fail(function (data) {
-            // console.log(data.status);
-            checkStatus(data.status);
-
+        rows.forEach(row => {
+            row.createdDate = formatDate(row.createdAt, true);
+            row.lastUpdated = formatDate(row.updatedAt, true);
+            row.expiryDate = formatDate(row.expiresAt, true);
+            row.osVer = `${row.os} ${row.osVersion}`;
         });
     }
-    $.ajax({
 
-        // url: "./stats.json",
-        url: "api/server/stats",
-        headers: { Authorization: 'Bearer ' + localStorage.getItem("accessToken") },
-        method: 'GET',
-        // success: function (data) {
-    }).done(function (data) {
-        let card1 = (data.totalFloatingClients) + '/' + data.allowedFloatingClients
-        $("#card1").html(card1);
-        let card2 = data.leaseDuration + ' <small>SECS</small>'
-        $("#card2").html(card2);
-
-        if (data.expiresAt != 0) {
-            let card3 = expirationDate(data.expiresAt)
-            $("#card3").html(card3);
-        }
-        let card4 = data.status
-        let card4Stats = card4.replace("_", " ");
-        $("#card4").html(card4Stats);
-        if (card4 === "ok") {
-            $("#onlineActivationUi").addClass("hide-element");
-            $("#onlineDeactivationUi").removeClass("hide-element");
-            $("#card4").removeClass("card-stats");
-            $("#card4").addClass("card-stats-ok");
-            $("#deactivationTab").removeClass("hide-element");
-        }
-        else {
-            $("#onlineDeactivationUi").addClass("hide-element");
-            $("#onlineActivationUi").removeClass("hide-element");
-            $("#card4").removeClass("card-stats-ok");
-            $("#card4").addClass("card-stats");
-            $("#activationTab").removeClass("hide-element");
-        }
-        let version = "v" + data.version
-        // console.log(data.version);
-        $("#version").html(version);
-
-    }).fail(function (data) {
-        // console.log(data.status);
-        checkStatus(data.status);
-
-    });
-
-
-    // });
     function sortMetadata(a, b) {
-        if (a.key < b.key) {
-            return -1;
-        }
-        if (a.key > b.key) {
-            return 1;
-        }
-        return 0;
+        return a.key < b.key ? -1 : a.key > b.key ? 1 : 0;
     }
+
     function detail(index, row, $detail) {
-        // debugger;
         const html = [];
-        const a = [];
-        for (let prop in row) {
-            if (ignoreProperties.includes(prop)) {
-                continue;
-            }
-            let value;
-            let key;
-            if (timeProperties.includes(prop)) {
-                key = toTitleCase(prop);
-                value = dateFormatter(row[prop]);
-            }
-            else {
-                value = row[prop];
-                key = toTitleCase(prop);
-            }
-
-            html.push('<p><label class="detail-section"><b>' + `${key}` + ':</label></b> ' + `${value}` + '</p>')
+        
+        // Add row properties
+        Object.keys(row).forEach(prop => {
+            if (IGNORE_PROPERTIES.includes(prop)) return;
+            
+            const key = toTitleCase(prop);
+            const value = TIME_PROPERTIES.includes(prop) 
+                ? formatDate(row[prop], true) 
+                : row[prop];
+            
+            html.push(`<p><label class="detail-section"><b>${key}:</label></b> ${value}</p>`);
+        });
+        
+        // Add metadata
+        html.push('<hr/><h5>Metadata</h5><hr/>');
+        if (row.metadata) {
+            row.metadata.sort(sortMetadata).forEach(item => {
+                const key = item.key.replace("<", "&lt;").toUpperCase();
+                const value = toTitleCase(item.value.replace("<", "&lt;"));
+                html.push(`<p><label class="metadata-section detail-section abc"><b>${key}:</b></label>${value}</p>`);
+            });
         }
-        html.push('<hr/><h5>Metadata</h5><hr/>')
-        if (row.metadata != null) {
-            const sortable = row.metadata.sort(sortMetadata)
-
-            for (let i = 0; i < sortable.length; i++) {
-                if (sortable[i].key.includes("<")) {
-                    sortable[i].key = sortable[i].key.replace("<", "&lt;")
-                }
-                if (sortable[i].value.includes("<")) {
-                    sortable[i].value = sortable[i].value.replace('<', '&lt;');
-                }
-                html.push('<p><label class="metadata-section detail-section abc"><b>' + String((sortable[i].key)).toUpperCase() + ':</b></label>' + toTitleCase(sortable[i].value) + '</p>')
-            }
-        }
-        html.push('</tbody>')
+        
         return html.join('');
-
-    }
-    function toTitleCase(text) {
-        if (!text) {
-            return;
-        }
-        const titleCase = text.replace(/([A-Z]+)/g, ' $1').replace(/([A-Z][a-z])/g, ' $1');
-        return titleCase.charAt(0).toUpperCase() + titleCase.slice(1);
     }
 
-    $table.on('check.bs.table uncheck.bs.table ' +
-        'check-all.bs.table uncheck-all.bs.table',
-        function () {
-            $remove.prop('disabled', !$table.bootstrapTable('getSelections').length)
-            selections = getIdSelections()
-        })
+    // ==================== STATS MANAGEMENT ====================
+    function loadStats() {
+        $.ajax({
+            url: "api/server/stats",
+            headers: getAuthHeaders(),
+            method: 'GET'
+        }).done(function (data) {
+            $("#card1").html(`${data.totalFloatingClients}/${data.allowedFloatingClients}`);
+            $("#card2").html(`${data.leaseDuration} <small>SECS</small>`);
+            
+            if (data.expiresAt != 0) {
+                $("#card3").html(formatDate(data.expiresAt));
+            }
+            
+            const status = String(data.status || '').replace("_", " ");
+            $("#card4").html(status);
+            
+            updateActivationStatus(isActivatedStatus(data.status));
+            updateTabText(isActivatedStatus(data.status));
+            $("#version").html(`v${data.version}`);
+        }).fail(function (data) {
+            checkStatus(data.status);
+        });
+    }
 
+    // ==================== TABLE SETUP ====================
+    $table.on('check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs.table', function () {
+        $remove.prop('disabled', !$table.bootstrapTable('getSelections').length);
+        selections = getIdSelections();
+    });
 
     $remove.click(function () {
-        var ids = getIdSelections()
-        $table.bootstrapTable('remove', {
-            field: 'id',
-            values: ids
-        })
-        $remove.prop('disabled', true)
-    })
-
-
-    $("#switchToOffActivation").click(function () {
-        $("#onlineActivationUi").addClass("hide-element");
-        $("#offlineActivationUiOne").removeClass("hide-element");
-
-    });
-    $("#switchToOffActivation2").click(function () {
-        $("#offlineDeactivationGuide").addClass("hide-element");
-        $("#offlineActivationUiOne").removeClass("hide-element");
-
-    });
-    $("#switchToOnlineActivation").click(function () {
-        $("#offlineActivationUiOne").addClass("hide-element");
-        $("#onlineActivationUi").removeClass("hide-element");
-
+        const ids = getIdSelections();
+        $table.bootstrapTable('remove', { field: 'id', values: ids });
+        $remove.prop('disabled', true);
     });
 
-
-    $("#switchToOnlineActivation2").click(function () {
-        $("#offlineActivationUiTwo").addClass("hide-element");
-        $("#onlineActivationUi").removeClass("hide-element");
-
+    $table.bootstrapTable({
+        url: "api/floating-licenses",
+        ajaxOptions: {
+            headers: getAuthHeaders()
+        },
+        onLoadError: checkStatus,
+        onPreBody: dataFormatter,
+        onRefresh: loadStats,
+        columns: [
+            { checkbox: true, align: 'center', valign: 'middle' },
+            { field: "hostname", title: "Host Name" },
+            { field: "ip", title: "IP Address" },
+            { field: "osVer", title: "OS" },
+            { field: "createdDate", title: "Created at" },
+            { field: "lastUpdated", title: "Last Refreshed at" },
+            { field: "expiryDate", title: "Expires at" }
+        ],
+        pagination: true,
+        pageList: [10, 25, 50],
+        search: true,
+        showRefresh: true,
+        showFullscreen: true,
+        detailViewByClick: true,
+        detailView: true,
+        detailFormatter: detail,
+        checkboxHeader: true
     });
 
-    $("#switchToOffDeactivation").click(function () {
-        $("#onlineDeactivationUi").addClass("hide-element");
-        $("#offlineDeactivationUi").removeClass("hide-element");
-    });
-    $("#switchToOnlineDeactivation").click(function () {
-        $("#offlineDeactivationUi").addClass("hide-element");
-        $("#onlineDeactivationUi").removeClass("hide-element");
-    });
-
-    // Next btn
-    $("#offlineActivationstep1").submit(function (e) {
-        // debugger;
+    // ==================== TAB NAVIGATION ====================
+    $('#tabActivation').on('click', function (e) {
         e.preventDefault();
-        let key = $("#keyToGen").val();
-        $("#offlineKey").val(key);
-        $("#offlineActivationUiOne").addClass("hide-element");
-        $("#offlineActivationUiTwo").removeClass("hide-element");
-        // $("#progressLink").removeClass("progress-link");
-        // $("#progressLink").addClass("progress-link-colored");
-        // $('#onlineActivationUi').addClass("hide-element");
-
+        toggleElements('#onlineActivationUi', ['#offlineActivationUiOne', '#offlineActivationUiTwo', '#onlineDeactivationUi', '#offlineDeactivationUi', '#offlineDeactivationGuide']);
+        $('#tabActivation').addClass('active');
+        $('#tabDeactivation').removeClass('active');
     });
-    $("#previousBtn").click(function () {
-        // debugger;
-        $("#offlineActivationUiTwo").addClass("hide-element");
-        $("#offlineActivationUiOne").removeClass("hide-element");
-    });
-    $("#deactivateOfflineUi").click(function () {
-        deactivationkey = {
-            licenseKey: $("#deactivationKeyOffline").val()
-        };
-        $("#offlineDeactivationUi").addClass("hide-element");
-        $("#offlineDeactivationGuide").removeClass("hide-element");
-
-    });
-
-
-    // table.....
-    let table = $('#table').bootstrapTable(
-        {
-            url: "api/floating-licenses",
-            // url: './activations.json',
-            ajaxOptions: {
-                headers: { 'Authorization': 'Bearer ' + localStorage.getItem("accessToken") }
-
-                // beforeSend: function () {
-                //     console.log("before send");
-                // }
-            },
-            onLoadSuccess: function (status) {
-                // console.log("success floating") //ajax success
-            },
-            onLoadError: function (status) {
-                // console.log("fail floating..") 
-                checkStatus(status)
-
-            },
-            onPreBody: dataFormatter,
-
-            onRefresh: stats,
-            // onExpandRow: row,
-            columns: [
-                {
-                    checkbox: true,
-                    align: 'center',
-                    valign: 'middle'
-                },
-                {
-                    "field": "hostname",
-                    "title": "Host Name"
-                },
-                {
-                    "field": "ip",
-                    "title": "IP Address"
-                },
-                {
-                    "field": "osVer",
-                    "title": "OS"
-                },
-                {
-                    "field": "createdDate",
-                    "title": "Created at"
-                },
-                {
-                    "field": "lastUpdated",
-                    "title": "Last Refreshed at"
-                },
-                {
-                    "field": "expiryDate",
-                    "title": "Expires at"
-                }
-            ],
-            pagination: true,
-            pageList: [10, 25, 50],
-            search: true,
-            showRefresh: true,
-            showFullscreen: true,
-            detailViewByClick: true,
-            detailView: true,
-            detailFormatter: detail,
-            checkboxHeader: true
-
-        }
-    );
-    // Login page
-
-    $("#loginBtn").submit(function (e) {
-
+    
+    $('#tabDeactivation').on('click', function (e) {
         e.preventDefault();
-        let url = "api/login"
-        const credentials = {
-            userName: $("#userName").val(),
-            password: $("#password").val()
-        }
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: JSON.stringify(credentials),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json"
-        }).done(function (data) {
+        toggleElements('#onlineDeactivationUi', ['#onlineActivationUi', '#offlineActivationUiOne', '#offlineActivationUiTwo', '#offlineDeactivationUi']);
+        $('#tabDeactivation').addClass('active');
+        $('#tabActivation').removeClass('active');
+    });
+    
+    $('#tabActivation').trigger('click');
 
-            // let token = JSON.parse(data)
-            localStorage.setItem("accessToken", data.accessToken);
-            //redirect to the dashboard
-            location.href = "index.html"// /app
+    // ==================== SWITCH HANDLERS ====================
+    const switchHandlers = {
+        'switchToOffActivation': { show: '#offlineActivationUiOne', hide: '#onlineActivationUi' },
+        'switchToOffActivation2': { show: '#offlineActivationUiOne', hide: '#offlineDeactivationGuide' },
+        'switchToOnlineActivation': { show: '#onlineActivationUi', hide: '#offlineActivationUiOne' },
+        'switchToOnlineActivation2': { show: '#onlineActivationUi', hide: '#offlineActivationUiTwo' },
+        'switchToOffDeactivation': { show: '#offlineDeactivationUi', hide: '#onlineDeactivationUi' },
+        'switchToOnlineDeactivation': { show: '#onlineDeactivationUi', hide: '#offlineDeactivationUi' }
+    };
 
-        }).fail(function (data) {
-
-            //redirect back to the login page
-            // location.href = "login.html"
-            // alert
-            $("#authenticationAlert").removeClass("hide-element");
+    Object.keys(switchHandlers).forEach(id => {
+        $(`#${id}`).click(function() {
+            const { show, hide } = switchHandlers[id];
+            toggleElements(show, hide);
+            if (id === 'switchToOffActivation') {
+                updateAllStatusBadges(currentActivationStatus);
+                updateTabText(currentActivationStatus);
+            }
         });
     });
-    $("#logout").click(function () {
-        localStorage.clear();
-        location.href = "login.html"
-    })
-    $("#logoutSettingPage").click(function () {
-        localStorage.clear();
-        location.href = "login.html"
-    })
 
-    // Settings page online activation
-
-    $("#activateOnline").submit(function (e) {
-        // debugger;
+    // ==================== OFFLINE ACTIVATION STEP 1 ====================
+    $("#offlineActivationstep1").submit(function (e) {
         e.preventDefault();
-        $("#mainBtn").addClass("hide-element");
-        $("#activatingBtn").removeClass("hide-element");
+        $("#offlineKey").val($("#keyToGen").val());
+        toggleElements('#offlineActivationUiTwo', '#offlineActivationUiOne');
+    });
+
+    $("#previousBtn").click(function () {
+        toggleElements('#offlineActivationUiOne', '#offlineActivationUiTwo');
+    });
+
+    $("#deactivateOfflineUi").click(function () {
+        deactivationkey = { licenseKey: $("#deactivationKeyOffline").val() };
+        toggleElements('#offlineDeactivationGuide', '#offlineDeactivationUi');
+    });
+
+    // ==================== API CALL HELPERS ====================
+    function handleActivationSuccess() {
+        updateActivationStatus(true);
+        updateTabText(true);
+    }
+
+    function handleDeactivationSuccess() {
+        updateActivationStatus(false);
+        updateTabText(false);
+    }
+
+    function handleError(errorData, errorSelector, defaultMessage) {
+        const errorCode = errorData.responseJSON && errorData.responseJSON.code ? errorData.responseJSON.code : 'Unknown error';
+        const errorMessage = `${defaultMessage}: ${errorCode}`;
+        $(errorSelector + ' .response-text, ' + errorSelector + ' h6').text(errorMessage);
+        showElement(errorSelector);
+    }
+
+    // ==================== ONLINE ACTIVATION ====================
+    $("#activateOnline").submit(function (e) {
+        e.preventDefault();
+        toggleElements('#activatingBtn', '#mainBtn');
         $("#activating").prop('disabled', true);
 
-        let url = "api/server/activate"
-        const activationkey = {
-            licenseKey: $("#keyOnline").val()
-        };
-
         $.ajax({
             type: "POST",
-            url: url,
-            data: JSON.stringify(activationkey),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json"
+            url: "api/server/activate",
+            headers: getAuthHeaders(),
+            data: JSON.stringify({ licenseKey: $("#keyOnline").val() }),
+            ...getAjaxConfig()
         }).done(function (data) {
-
-            $("#onlineMsgSuccessActivate").removeClass("hide-element");
-            $("#activatingBtn").addClass("hide-element");
-            $("#onlineDeactivationUi").removeClass("hide-element");
-            $("#onlineActivationUi").addClass("hide-element");
-            $("#activationTab").addClass("hide-element");
-            $("#deactivationTab").removeClass("hide-element");
+            showElement('#onlineMsgSuccessActivate');
+            toggleElements('#mainBtn', '#activatingBtn');
             $('#keyOnline').val("");
             $("#activate").prop('disabled', false);
-
+            handleActivationSuccess();
         }).fail(function (data) {
-            $("#onlineMsgFailActivate").removeClass("hide-element");
-            $("#mainBtn").removeClass("hide-element");
-            $("#activatingBtn").addClass("hide-element");
+            handleError( data, '#onlineMsgFailActivate', 'Server activation failed');
+            toggleElements('#mainBtn', '#activatingBtn');
+            $("#activating").prop('disabled', false);
         });
     });
 
-    // settings page  Online Deactivation
-
+    // ==================== ONLINE DEACTIVATION ====================
     $("#deactivateOnline").submit(function (e) {
-        // debugger;
         e.preventDefault();
-        $("#deactivate").addClass("hide-element");
-        $("#deactivatingBtn").removeClass("hide-element");
+        toggleElements('#deactivatingBtn', '#deactivate');
         $("#deactivating").prop('disabled', true);
 
-        let url = "api/server/deactivate"
-        const activationkey = {
-            licenseKey: $("#keyOnlineDeactivation").val()
-
-        };
         $.ajax({
             type: "POST",
-            url: url,
-            data: JSON.stringify(activationkey),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json"
+            url: "api/server/deactivate",
+            headers: getAuthHeaders(),
+            data: JSON.stringify({ licenseKey: $("#keyOnlineDeactivation").val() }),
+            ...getAjaxConfig()
         }).done(function (data) {
-            // // debugger;
-            $("#deactivatingBtn").addClass("hide-element");
-            $("#deactivate").removeClass("hide-element");
-            $("#onlineMsgSuccessDeactivate").removeClass("hide-element");
-            $("#mainBtn").removeClass("hide-element");
-            $("#onlineActivationUi").removeClass("hide-element");
-            $("#onlineDeactivationUi").addClass("hide-element");
+            toggleElements(['#deactivate', '#onlineMsgSuccessDeactivate'], '#deactivatingBtn');
             $(".form-check-input").prop("checked", false);
             $('#keyOnlineDeactivation').val("");
-            $("#activationTab").removeClass("hide-element");
-            $("#deactivationTab").addClass("hide-element");
-
+            handleDeactivationSuccess();
         }).fail(function (data) {
-            $("#deactivatingBtn").addClass("hide-element");
-            $("#onlineMsgFailDeactivate").removeClass("hide-element");
-            $("#deactivate").removeClass("hide-element");
-
+            handleError(data, '#onlineMsgFailDeactivate', 'Server deactivation failed');
+            toggleElements(['#deactivate'], '#deactivatingBtn');
+            $("#deactivating").prop('disabled', false);
         });
     });
 
-    //settings page offline activation step 1 generating request file
-
+    // ==================== OFFLINE ACTIVATION STEP 1 ====================
     $("#generateBtn").click(function (e) {
-        //  debugger;
         e.preventDefault();
-        let url = "api/server/offline-activation-request"
-        const activationkey = {
-            licenseKey: $("#keyToGen").val()
-
-        };
         $.ajax({
             type: "POST",
-            url: url,
-            data: JSON.stringify(activationkey),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json"
+            url: "api/server/offline-activation-request",
+            headers: getAuthHeaders(),
+            data: JSON.stringify({ licenseKey: $("#keyToGen").val() }),
+            ...getAjaxConfig()
         }).done(function (data) {
-            var blob = new Blob([data.offlineRequest], { type: "text/plain;charset=utf-8" });
+            const blob = new Blob([data.offlineRequest], { type: "text/plain;charset=utf-8" });
             FileSaver.saveAs(blob, "offline_activation_request.txt");
-            $("#offlineMsgSuccess1").removeClass("hide-element");
-
+            showElement('#offlineMsgSuccess1');
         }).fail(function (data) {
-            $("#offlineMsgFail1").removeClass("hide-element");
+            handleError( data, '#offlineMsgFail1', 'Failed to generate offline activation request');
         });
-
     });
 
-    // settings page offline activation step 2 
-
+    // ==================== OFFLINE ACTIVATION STEP 2 ====================
     $("#offlineActivationStep2").submit(function (e) {
-        // debugger;
         e.preventDefault();
-        $("#activateOffline").addClass("hide-element");
-        $("#activatingOffline").removeClass("hide-element");
+        toggleElements('#activatingOffline', '#activateOffline');
         $("#activatingOffline").prop('disabled', true);
-        let url = "api/server/offline-activate"
-        const activationkey = {
-            licenseKey: $("#offlineKey").val(),
-            offlineResponse: $("#responseFile").val()
 
-        };
         $.ajax({
             type: "POST",
-            url: url,
-            data: JSON.stringify(activationkey),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json"
+            url: "api/server/offline-activate",
+            headers: getAuthHeaders(),
+            data: JSON.stringify({
+                licenseKey: $("#offlineKey").val(),
+                offlineResponse: $("#responseFile").val()
+            }),
+            ...getAjaxConfig()
         }).done(function (data) {
-
-            $("#offlineActivationUiTwo").addClass("hide-element");
-            $("#activateOffline").removeClass("hide-element");
-            $("#offlineDeactivationUi").removeClass("hide-element");
-            $("#offlineMsgSuccess2").removeClass("hide-element");
-            $("#activationTab").addClass("hide-element");
-            $("#deactivationTab").removeClass("hide-element");
-            $('#keyToGen').val("");
-            $('#offlineKey').val("");
-            $('#responseFile').val("");
-
+            toggleElements(['#activateOffline', '#offlineDeactivationUi', '#offlineMsgSuccess2'], '#offlineActivationUiTwo');
+            toggleElements('#deactivationTab', '#activationTab');
+            $('#keyToGen, #offlineKey, #responseFile').val("");
+            handleActivationSuccess();
         }).fail(function (data) {
-
-            $("#offlineMsgFail2").removeClass("hide-element");
-            $("#activatingOffline").addClass("hide-element");
-            $("#activateOffline").removeClass("hide-element");
-
+            handleError(data, '#offlineMsgFail2', 'Offline activation failed');
+            toggleElements('#activateOffline', '#activatingOffline');
+            $("#activatingOffline").prop('disabled', false); 
         });
     });
 
-    // settings page offline deactivation
-
+    // ==================== OFFLINE DEACTIVATION ====================
     $("#deactivateOffline").submit(function (e) {
-        //  debugger;
         e.preventDefault();
-
-        $("#deactivationGenerateBtn").addClass("hide-element");
-        $("#deactivatingGen").removeClass("hide-element");
+        toggleElements('#deactivatingGen', '#deactivationGenerateBtn');
         $("#deactivating123").prop('disabled', true);
-        let url = "api/server/offline-deactivate"
-        deactivationkey = {
-            licenseKey: $("#deactivationKeyOffline").val()
-
-        };
 
         $.ajax({
             type: "POST",
-            url: url,
-            data: JSON.stringify(deactivationkey),
-            contentType: "application/json; charset=utf-8",
-            dataType: "json"
+            url: "api/server/offline-deactivate",
+            headers: getAuthHeaders(),
+            data: JSON.stringify({ licenseKey: $("#deactivationKeyOffline").val() }),
+            ...getAjaxConfig()
         }).done(function (data) {
-            var blob = new Blob([data.offlineRequest], { type: "text/plain;charset=utf-8" });
+            const blob = new Blob([data.offlineRequest], { type: "text/plain;charset=utf-8" });
             FileSaver.saveAs(blob, "offline_deactivation_request.txt");
-
-            $("#offlineMsgSuccessForDeactivation").removeClass("hide-element");
-            $("#offlineDeactivationUi").addClass("hide-element");
-            $("#offlineDeactivationGuide").removeClass("hide-element");
+            
+            toggleElements(['#offlineMsgSuccessForDeactivation', '#offlineDeactivationGuide', '#activationTab'], 
+                          ['#offlineDeactivationUi', '#deactivationTab', '#deactivatingGen']);
+            showElement('#deactivationGenerateBtn');
             $('#deactivationKeyOffline').val("");
-            $("#activationTab").removeClass("hide-element");
-            $("#deactivationTab").addClass("hide-element");
-            $("#deactivatingGen").addClass("hide-element");
-            $("#deactivationGenerateBtn").removeClass("hide-element");
-
+            handleDeactivationSuccess();
         }).fail(function (data) {
-
-            $("#offlineMsgFailForDeactivation").removeClass("hide-element");
-            $("#deactivateGen").removeClass("hide-element");
-            $("#deactivationGenerateBtn").removeClass("hide-element");
-            $("#deactivating123").addClass("hide-element");
-
+            handleError(data, '#offlineMsgFailForDeactivation', 'Failed to generate offline deactivation request');
+            toggleElements(['#deactivationGenerateBtn'], ['#deactivatingGen', '#deactivating123']);
+            $("#deactivating123").prop('disabled', false);
         });
     });
 
+    // ==================== LOGIN/LOGOUT ====================
+    $("#loginBtn").submit(function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: "POST",
+            url: "api/login",
+            data: JSON.stringify({
+                userName: $("#userName").val(),
+                password: $("#password").val()
+            }),
+            ...getAjaxConfig()
+        }).done(function (data) {
+            localStorage.setItem("accessToken", data.accessToken);
+            location.href = "index.html";
+        }).fail(function (data) {
+            showElement("#authenticationAlert");
+        });
+    });
+
+    $("#logout, #logoutSettingPage").click(function () {
+        localStorage.clear();
+        location.href = "login.html";
+    });
+
+    // ==================== INITIALIZE ====================
+    loadStats();
 
 });
