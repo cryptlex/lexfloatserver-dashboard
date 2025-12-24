@@ -161,12 +161,9 @@ if (!isTokenValid() && !location.href.includes("login")) {
 $(document).ready(function () {
     // debugger;
     var $table = $('#table')
-    var $remove = $('#remove')
-    var selections = []
 
     // Initialize branding
     $("#companyName, #branding").html(Cryptlex.title);
-    $("#copyright").html(Cryptlex.footer);
 
     // ==================== DATA FORMATTING ====================
     function dataFormatter(rows) {
@@ -236,17 +233,6 @@ $(document).ready(function () {
     }
 
     // ==================== TABLE SETUP ====================
-    $table.on('check.bs.table uncheck.bs.table check-all.bs.table uncheck-all.bs.table', function () {
-        $remove.prop('disabled', !$table.bootstrapTable('getSelections').length);
-        selections = getIdSelections();
-    });
-
-    $remove.click(function () {
-        const ids = getIdSelections();
-        $table.bootstrapTable('remove', { field: 'id', values: ids });
-        $remove.prop('disabled', true);
-    });
-
     $table.bootstrapTable({
         url: "api/floating-licenses",
         ajaxOptions: {
@@ -325,7 +311,6 @@ $(document).ready(function () {
     });
 
     $("#deactivateOfflineUi").click(function () {
-        deactivationkey = { licenseKey: $("#deactivationKeyOffline").val() };
         toggleElements('#offlineDeactivationGuide', '#offlineDeactivationUi');
     });
 
@@ -430,8 +415,7 @@ $(document).ready(function () {
             }),
             ...getAjaxConfig()
         }).done(function (data) {
-            toggleElements(['#activateOffline', '#offlineDeactivationUi', '#offlineMsgSuccess2'], '#offlineActivationUiTwo');
-            toggleElements('#deactivationTab', '#activationTab');
+            toggleElements(['#activateOffline', '#offlineDeactivationUi', '#offlineMsgSuccess2', '#deactivationTab'], ['#offlineActivationUiTwo', '#activationTab']);
             $('#keyToGen, #offlineKey, #responseFile').val("");
             handleActivationSuccess();
         }).fail(function (data) {
@@ -464,7 +448,7 @@ $(document).ready(function () {
             handleDeactivationSuccess();
         }).fail(function (data) {
             handleError(data, '#offlineMsgFailForDeactivation', 'Failed to generate offline deactivation request');
-            toggleElements(['#deactivationGenerateBtn'], ['#deactivatingGen', '#deactivating123']);
+            toggleElements(['#deactivationGenerateBtn'], ['#deactivatingGen']);
             $("#deactivating123").prop('disabled', false);
         });
     });
