@@ -57,22 +57,18 @@
     </div>
 
     <!-- Tabs section -->
-    <div class="section hide-element" id="activationTab">
+    <div class="section" id="settingsTabs">
         <div class="container">
-            <ul class="nav nav-tabs setting-tabs">
-                <li class="nav-item">
-                    <a class="nav-link active tabs-text" aria-current="page">ACTIVATION</a>
-                </li>
+          <ul class="nav nav-tabs setting-tabs">
+            <li class="nav-item">
+              <a id="tabActivation" class="nav-link active tabs-text" href="#">ACTIVATE</a>
+            </li>
+            <li class="nav-item">
+              <a id="tabDeactivation" class="nav-link tabs-text" href="#">DEACTIVATE</a>
+            </li>
+          </ul>
         </div>
-    </div>
-    <div class="section hide-element" id="deactivationTab">
-        <div class="container">
-            <ul class="nav nav-tabs setting-tabs">
-                <li class="nav-item">
-                    <a class="nav-link active tabs-text" aria-current="page">DEACTIVATION</a>
-                </li>
-        </div>
-    </div>
+      </div>
 
     <div class="section">
         <div class="container">
@@ -115,10 +111,10 @@
                         </form>
                         <!-- Response section starts -->
 
-                        <div id="onlineMsgSuccessDeactivate" class="response-section hide-element">
+                        <div id="onlineMsgSuccessActivate" class="response-section hide-element">
                             <div class="alert alert-success alert-dismissible" role="alert">
                                 <button type="button" class="close cross-margin" data-dismiss="alert">&times;</button>
-                                <h6 class="response-text">Server Deactivated Successfully!</h6>
+                                <h6 class="response-text">Server Activated Successfully!</h6>
                             </div>
                         </div>
                         <div id="onlineMsgFailActivate" class="response-section hide-element">
@@ -178,24 +174,19 @@
                                 </div>
                             </div>
                         </form>
-                        <!-- Response section for deactivation starts -->
 
+                        <div id="onlineMsgSuccessDeactivate" class="response-section hide-element">
+                            <div class="alert alert-success alert-dismissible" role="alert">
+                                <button type="button" class="close cross-margin" data-dismiss="alert">&times;</button>
+                                <h6 class="response-text">Server Deactivated Successfully!</h6>
+                            </div>
+                        </div>
                         <div id="onlineMsgFailDeactivate" class="response-section hide-element">
                             <div class="alert alert-danger alert-dismissible fade show">
                                 <button type="button" class="close cross-margin" data-dismiss="alert">&times;</button>
                                 <h6 class="response-text">Server Deactivation Failed!</h6>
                             </div>
                         </div>
-                        <div id="onlineMsgSuccessActivate" class="response-section hide-element">
-                            <div class="alert alert-success alert-dismissible" role="alert">
-                                <button type="button" class="close cross-margin" data-dismiss="alert">&times;</button>
-                                <h6 class="response-text">Server Activated Successfully!</h6>
-                            </div>
-                        </div>
-
-
-
-                        <!-- Response section for deactivation ends -->
                     </div>
                     <!-- Online Deactivation ends -->
 
