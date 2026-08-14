@@ -1,15 +1,14 @@
 import jquery from "jquery";
 const $ = jquery
+import 'bootstrap/dist/js/bootstrap.bundle'
 import "bootstrap-table";
 import FileSaver from 'file-saver';
 import jwtDecode from "jwt-decode";
-import 'bootstrap-table';
 import '@fortawesome/fontawesome-free/css/all.css';
 import '@fortawesome/fontawesome-free/js/all.js';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '../sass/main.scss';
 import './config.js'
-import 'bootstrap/dist/js/bootstrap.bundle'
 
 // ==================== CONSTANTS ====================
 const ACTIVATED_STATUSES = ['ok', 'expired', 'suspended', 'grace_period_over'];

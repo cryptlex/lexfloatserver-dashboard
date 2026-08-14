@@ -82,6 +82,11 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.js$/,
+        include: /node_modules[\\/]bootstrap-table/,
+        type: 'javascript/auto'
+      },
+      {
         test: /\.scss$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
       },
