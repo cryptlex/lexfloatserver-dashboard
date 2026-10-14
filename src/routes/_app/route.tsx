@@ -15,7 +15,7 @@ import {
     SidebarTrigger,
 } from '@cryptlex/web-components/components/sidebar';
 import { createFileRoute, createLink, Outlet, redirect, useNavigate } from '@tanstack/react-router';
-import { isLoggedIn } from '@/lib/api';
+import { isLoggedIn, removeAccessToken } from '@/lib/api';
 
 const SidebarLink = createLink(SidebarMenuButton);
 
@@ -65,7 +65,7 @@ function AppLayout() {
                                 icon={IcLogin}
                                 className="text-destructive [&_svg]:rotate-180"
                                 onPress={() => {
-                                    localStorage.removeItem('accessToken');
+                                    removeAccessToken();
                                     navigate({ to: '/login' });
                                 }}
                             >

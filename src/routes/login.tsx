@@ -6,7 +6,7 @@ import { useAppForm } from '@cryptlex/web-components/utilities/form-hook';
 import { V_STRING_REQUIRED } from '@cryptlex/web-components/utilities/validators';
 import { useMutation } from '@tanstack/react-query';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
-import { apiFetch, isLoggedIn } from '@/lib/api';
+import { apiFetch, isLoggedIn, setAccessToken } from '@/lib/api';
 import type { AccessTokenResponse, LoginRequest } from '@/types';
 
 export const Route = createFileRoute('/login')({
@@ -27,7 +27,7 @@ function LoginPage() {
         mutationFn: (body: LoginRequest) =>
             apiFetch<AccessTokenResponse>('/api/login', { method: 'POST', body: JSON.stringify(body) }),
         onSuccess: data => {
-            localStorage.setItem('accessToken', data.accessToken);
+            setAccessToken(data.accessToken);
             navigate({ to: '/' });
         },
     });
