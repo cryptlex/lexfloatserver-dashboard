@@ -6,7 +6,7 @@ import { createRootRouteWithContext, HeadContent, Outlet, useRouteContext } from
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { apiFetch } from '@/lib/api';
 
-type Branding = { appName?: string; logoUrl?: string; faviconUrl?: string; hue?: number };
+type Branding = { appName?: string; logoUrl?: string | null; faviconUrl?: string | null; hue?: number };
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
     beforeLoad: async ({ context }) => {
@@ -16,9 +16,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
             staleTime: 'static',
         });
         if (typeof branding.hue === 'number') setThemeHue(branding.hue);
-        if (branding.faviconUrl)
-            document.querySelector<HTMLLinkElement>('link[rel="icon"]')?.setAttribute('href', branding.faviconUrl);
-        return { branding: { ...branding, appName: branding.appName || 'Licensing Server' } };
+        return {
+            branding: {
+                appName: branding.appName,
+                logoUrl: branding.logoUrl,
+            },
+        };
     },
     head: ({ match }) => ({
         meta: [{ title: match.context.branding.appName }],
