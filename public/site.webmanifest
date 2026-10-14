@@ -1,0 +1,7 @@
+{
+    "short_name": "LexFloatServer",
+    "name": "LexFloatServer Dashboard",
+    "start_url": "./",
+    "background_color": "#fafafa",
+    "theme_color": "#fafafa"
+}

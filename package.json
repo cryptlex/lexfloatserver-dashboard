@@ -1,46 +1,50 @@
 {
-  "name": "lexfloatserver-dashboard",
-  "version": "0.0.1",
-  "description": "LexFloatServer Dashboard",
-  "keywords": [
-    "lexfloatserver"
-  ],
-  "license": "",
-  "author": "Cryptlex Team",
-  "scripts": {
-    "build": "webpack"
-  },
-  "repository": {},
-  "devDependencies": {
-    "@babel/core": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "@fortawesome/fontawesome-free": "^5.15.2",
-    "babel-loader": "^8.2.2",
-    "boo": "^2.0.0",
-    "bootstrap": "^4.6.0",
-    "bootstrap-table": "^1.18.1",
-    "clean-webpack-plugin": "^3.0.0",
-    "copy-webpack-plugin": "^8.1.0",
-    "css-loader": "^5.0.2",
-    "css-minimizer-webpack-plugin": "^3.4.1",
-    "file-loader": "^6.2.0",
-    "file-saver": "^2.0.5",
-    "html-loader": "^2.1.0",
-    "html-webpack-injector": "^1.1.4",
-    "html-webpack-plugin": "^5.2.0",
-    "jquery": "^3.5.1",
-    "mini-css-extract-plugin": "^1.3.8",
-    "popper.js": "^1.16.1",
-    "roboto-fontface": "^0.10.0",
-    "sass": "^1.32.8",
-    "sass-loader": "^11.0.1",
-    "style-loader": "^2.0.0",
-    "terser-webpack-plugin": "^5.3.1",
-    "webpack": "^5.22.0",
-    "webpack-cli": "^4.5.0",
-    "webpack-merge": "^5.7.3"
-  },
-  "dependencies": {
-    "jwt-decode": "^3.1.2"
-  }
+    "name": "lexfloatserver-dashboard",
+    "version": "1.0.0",
+    "private": true,
+    "description": "LexFloatServer Dashboard",
+    "author": "Cryptlex Team",
+    "type": "module",
+    "packageManager": "pnpm@12.11.0",
+    "scripts": {
+        "dev": "vite",
+        "build": "tsc -b && vite build",
+        "preview": "vite preview",
+        "lint": "biome lint .",
+        "lint:fix": "biome lint --write .",
+        "format": "biome format --write .",
+        "check": "biome check --write .",
+        "prepare": "husky"
+    },
+    "lint-staged": {
+        "*.{ts,tsx,json,mts,css}": [
+            "biome check --write --no-errors-on-unmatched"
+        ]
+    },
+    "dependencies": {
+        "@cryptlex/web-components": "6.7.32",
+        "@tailwindcss/vite": "4.3.3",
+        "@tanstack/react-query": "5.102.7",
+        "@tanstack/react-router": "1.170.32",
+        "jwt-decode": "4.0.0",
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+        "tailwindcss": "4.3.3",
+        "tailwindcss-react-aria-components": "2.2.0",
+        "zod": "4.4.3"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "2.5.10",
+        "@tanstack/react-query-devtools": "5.102.7",
+        "@tanstack/react-router-devtools": "1.167.1",
+        "@tanstack/router-plugin": "1.168.35",
+        "@types/node": "22.19.1",
+        "@types/react": "19.2.18",
+        "@types/react-dom": "19.2.5",
+        "@vitejs/plugin-react": "6.1.0",
+        "husky": "9.1.7",
+        "lint-staged": "15.2.10",
+        "typescript": "5.8.3",
+        "vite": "8.2.2"
+    }
 }

@@ -1,3 +1,27 @@
-dist
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
 node_modules
+dist
+*.local
 .cache
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# TanStack Router
+.tanstack
+*.tsbuildinfo
+.env
+.pnpm-store/

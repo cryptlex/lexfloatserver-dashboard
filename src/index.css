@@ -1,0 +1,3 @@
+@import "@cryptlex/web-components/index.css";
+@source "./";
+@source "../node_modules/@cryptlex/web-components";

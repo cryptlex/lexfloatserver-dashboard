@@ -1,0 +1,7 @@
+allowBuilds:
+    '@tailwindcss/oxide': true
+    esbuild: true
+minimumReleaseAge: 4320
+minimumReleaseAgeExclude:
+    - '@cryptlex/web-components'
+    - '@cryptlex/web-api-types'
