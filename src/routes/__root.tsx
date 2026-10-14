@@ -5,14 +5,13 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, HeadContent, Outlet, useRouteContext } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { apiFetch } from '@/lib/api';
-
-type Branding = { appName?: string; logoUrl?: string | null; faviconUrl?: string | null; hue?: number };
+import type { Branding } from '@/types';
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
     beforeLoad: async ({ context }) => {
         const branding = await context.queryClient.query({
             queryKey: ['branding'],
-            queryFn: () => apiFetch<Branding>('/api/v4/branding').catch((): Branding => ({})),
+            queryFn: () => apiFetch<Branding>('/api/v4/branding').catch((): Partial<Branding> => ({})),
             staleTime: 'static',
         });
         if (typeof branding.hue === 'number') setThemeHue(branding.hue);

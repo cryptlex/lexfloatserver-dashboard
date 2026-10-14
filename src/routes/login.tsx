@@ -7,6 +7,7 @@ import { V_STRING_REQUIRED } from '@cryptlex/web-components/utilities/validators
 import { useMutation } from '@tanstack/react-query';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { apiFetch, isLoggedIn } from '@/lib/api';
+import type { AccessTokenResponse, LoginRequest } from '@/types';
 
 export const Route = createFileRoute('/login')({
     beforeLoad: () => {
@@ -23,8 +24,8 @@ function LoginPage() {
     const { branding } = Route.useRouteContext();
 
     const login = useMutation({
-        mutationFn: (body: { username: string; password: string }) =>
-            apiFetch<{ accessToken: string }>('/api/login', { method: 'POST', body: JSON.stringify(body) }),
+        mutationFn: (body: LoginRequest) =>
+            apiFetch<AccessTokenResponse>('/api/login', { method: 'POST', body: JSON.stringify(body) }),
         onSuccess: data => {
             localStorage.setItem('accessToken', data.accessToken);
             navigate({ to: '/' });
