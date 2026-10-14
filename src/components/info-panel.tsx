@@ -13,7 +13,7 @@ export function InfoPanel({ title, children }: { title: React.ReactNode; childre
 }
 
 export function InfoGrid({ children }: { children: React.ReactNode }) {
-    return <div className="grid grid-cols-2 gap-x-13 gap-y-3">{children}</div>;
+    return <div className="grid grid-cols-1 gap-x-13 gap-y-3 sm:grid-cols-2">{children}</div>;
 }
 
 export function InfoItem({
@@ -29,7 +29,9 @@ export function InfoItem({
 }) {
     return (
         <div className={classNames('min-w-0 space-y-1', className)}>
-            <div className="truncate text-xs font-semibold uppercase tracking-wider text-text-secondary">{label}</div>
+            <div className="wrap-anywhere text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                {label}
+            </div>
             <div className={classNames('text-sm font-medium text-foreground wrap-anywhere', mono && 'font-mono')}>
                 {value}
             </div>

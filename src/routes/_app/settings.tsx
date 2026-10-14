@@ -55,11 +55,11 @@ function SettingsPage() {
                 <InfoGrid>
                     <InfoItem label="SSL" value={config.ssl.enabled ? 'Enabled' : 'Disabled'} />
                     <InfoItem label="Admin users" value={config.auth.admins.join(', ') || '—'} />
-                    <InfoItem label="Blocked IPs" value={list(config.server.blockedIps)} className="col-span-2" />
+                    <InfoItem label="Blocked IPs" value={list(config.server.blockedIps)} className="sm:col-span-2" />
                     <InfoItem
                         label="Trusted proxies"
                         value={list(config.proxy.trustedProxies)}
-                        className="col-span-2"
+                        className="sm:col-span-2"
                     />
                 </InfoGrid>
             </InfoPanel>
