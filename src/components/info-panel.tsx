@@ -16,9 +16,19 @@ export function InfoGrid({ children }: { children: React.ReactNode }) {
     return <div className="grid grid-cols-2 gap-x-13 gap-y-3">{children}</div>;
 }
 
-export function InfoItem({ label, value, mono }: { label: string; value: React.ReactNode; mono?: boolean }) {
+export function InfoItem({
+    label,
+    value,
+    mono,
+    className,
+}: {
+    label: string;
+    value: React.ReactNode;
+    mono?: boolean;
+    className?: string;
+}) {
     return (
-        <div className="min-w-0 space-y-1">
+        <div className={classNames('min-w-0 space-y-1', className)}>
             <div className="truncate text-xs font-semibold uppercase tracking-wider text-text-secondary">{label}</div>
             <div className={classNames('text-sm font-medium text-foreground wrap-anywhere', mono && 'font-mono')}>
                 {value}

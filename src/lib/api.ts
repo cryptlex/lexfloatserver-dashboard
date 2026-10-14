@@ -25,6 +25,12 @@ export async function apiFetch<TResponse>(path: string, init: RequestInit = {}):
 
     const response = await fetch(path, { ...init, headers });
     const body = response.status === 204 ? null : await response.json().catch(() => null);
+    // The token is missing, expired or was invalidated by a server restart: drop it and start over at login.
+    // A full page load also clears any cached data from the old session.
+    if (response.status === 401 && window.location.pathname !== '/login') {
+        localStorage.removeItem('accessToken');
+        window.location.replace('/login');
+    }
     if (!response.ok) {
         throw new ApiError(response.status, body?.code, body?.message);
     }
