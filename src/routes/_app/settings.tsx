@@ -46,18 +46,37 @@ function SettingsPage() {
                 <InfoGrid>
                     <InfoItem label="Version" value={stats.version} mono />
                     <InfoItem label="Port" value={config.server.port} mono />
-                    <InfoItem label="Host" value={config.server.cryptlexHost || 'Default'} mono />
-                    <InfoItem label="Lease duration" value={`${config.productDefaults.leaseDuration} seconds`} />
-                    <InfoItem label="Allowed clock offset" value={`${config.server.allowedClockOffset} seconds`} />
+                    <InfoItem
+                        label="Cryptlex Host"
+                        hint="The Cryptlex API this server syncs licenses with. Default unless overridden in config.yml."
+                        value={config.server.cryptlexHost || 'Default'}
+                        mono
+                    />
+                    <InfoItem
+                        label="Lease Duration"
+                        hint="How long a device can hold a seat without checking in. Products use this unless they override it. If the app closes without releasing its seat, for example after a crash, the seat becomes free when the lease runs out."
+                        value={`${config.productDefaults.leaseDuration} seconds`}
+                    />
+                    <InfoItem
+                        label="Allowed Clock Offset"
+                        hint="How far a device's clock can differ from this server's before its requests are refused."
+                        value={`${config.server.allowedClockOffset} seconds`}
+                    />
                 </InfoGrid>
             </InfoPanel>
             <InfoPanel title="Configuration">
                 <InfoGrid>
                     <InfoItem label="SSL" value={config.ssl.enabled ? 'Enabled' : 'Disabled'} />
-                    <InfoItem label="Admin users" value={config.auth.admins.join(', ') || '—'} />
-                    <InfoItem label="Blocked IPs" value={list(config.server.blockedIps)} className="sm:col-span-2" />
+                    <InfoItem label="Admin Users" value={config.auth.admins.join(', ') || '—'} />
                     <InfoItem
-                        label="Trusted proxies"
+                        label="Blocked IPs"
+                        hint="IP addresses refused by this server."
+                        value={list(config.server.blockedIps)}
+                        className="sm:col-span-2"
+                    />
+                    <InfoItem
+                        label="Trusted Proxies"
+                        hint="Proxies whose forwarded client IP this server accepts."
                         value={list(config.proxy.trustedProxies)}
                         className="sm:col-span-2"
                     />
@@ -66,16 +85,16 @@ function SettingsPage() {
             <InfoPanel title="Logging">
                 <InfoGrid>
                     <InfoItem
-                        label="Log level"
+                        label="Log Level"
                         value={['Debug', 'Information', 'Warning', 'Error'][config.logging.logLevel]}
                     />
-                    <InfoItem label="Console logs" value={config.logging.console.enabled ? 'Enabled' : 'Disabled'} />
-                    <InfoItem label="File logs" value={config.logging.file.enabled ? 'Enabled' : 'Disabled'} />
+                    <InfoItem label="Console Logs" value={config.logging.console.enabled ? 'Enabled' : 'Disabled'} />
+                    <InfoItem label="File Logs" value={config.logging.file.enabled ? 'Enabled' : 'Disabled'} />
                     {config.logging.file.enabled && (
                         <>
-                            <InfoItem label="Log directory" value={config.logging.file.directory} mono />
-                            <InfoItem label="Max file size" value={`${config.logging.file.maxSize} MB`} />
-                            <InfoItem label="Max backups" value={config.logging.file.maxBackups} />
+                            <InfoItem label="Log Directory" value={config.logging.file.directory} mono />
+                            <InfoItem label="Max File Size" value={`${config.logging.file.maxSize} MB`} />
+                            <InfoItem label="Max Backups" value={config.logging.file.maxBackups} />
                         </>
                     )}
                 </InfoGrid>
