@@ -1,9 +1,7 @@
 import { ToastProvider } from '@cryptlex/web-components/components/toast';
 import { setThemeHue } from '@cryptlex/web-components/utilities/theme';
 import { type QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { createRootRouteWithContext, HeadContent, Outlet, useRouteContext } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { apiFetch } from '@/lib/api';
 import type { Branding } from '@/types';
 
@@ -35,12 +33,6 @@ function RootComponent() {
             <HeadContent />
             <ToastProvider />
             <Outlet />
-            {import.meta.env.DEV && (
-                <>
-                    <ReactQueryDevtools buttonPosition="bottom-left" />
-                    <TanStackRouterDevtools position="bottom-right" />
-                </>
-            )}
         </QueryClientProvider>
     );
 }
