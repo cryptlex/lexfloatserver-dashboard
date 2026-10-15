@@ -46,12 +46,7 @@ function SettingsPage() {
                 <InfoGrid>
                     <InfoItem label="Version" value={stats.version} mono />
                     <InfoItem label="Port" value={config.server.port} mono />
-                    <InfoItem
-                        label="Cryptlex Host"
-                        hint="The Cryptlex API this server syncs licenses with. Default unless overridden in config.yml."
-                        value={config.server.cryptlexHost || 'Default'}
-                        mono
-                    />
+                    <InfoItem label="Host" value={config.server.cryptlexHost || 'Default'} mono />
                     <InfoItem
                         label="Lease Duration"
                         hint="How long a device can hold a seat without checking in. Products use this unless they override it. If the app closes without releasing its seat, for example after a crash, the seat becomes free when the lease runs out."
