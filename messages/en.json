@@ -213,6 +213,15 @@
         "sections": {
             "overview": {
                 "title": "Overview"
+            },
+            "stats": {
+                "products": {
+                    "label": "Products"
+                },
+                "devices": {
+                    "label": "Devices",
+                    "description": "{count} offline"
+                }
             }
         }
     },

@@ -3,13 +3,9 @@ import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { InfoGrid, InfoItem, InfoPanel } from '@/components/info-panel';
 import { apiFetch } from '@/lib/api';
+import { serverStatsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
-import type { ServerConfig, ServerStats } from '@/types';
-
-const statsQuery = queryOptions({
-    queryKey: ['server', 'stats'],
-    queryFn: () => apiFetch<ServerStats>('/api/v4/server/stats'),
-});
+import type { ServerConfig } from '@/types';
 
 const configQuery = queryOptions({
     queryKey: ['server', 'config'],
@@ -18,7 +14,7 @@ const configQuery = queryOptions({
 
 export const Route = createFileRoute('/_app/settings')({
     loader: ({ context }) =>
-        Promise.all([context.queryClient.query(statsQuery), context.queryClient.query(configQuery)]),
+        Promise.all([context.queryClient.query(serverStatsQuery), context.queryClient.query(configQuery)]),
     head: ({ match }) => ({
         meta: [
             {
@@ -33,7 +29,7 @@ export const Route = createFileRoute('/_app/settings')({
 });
 
 function SettingsPage() {
-    const { data: stats } = useSuspenseQuery(statsQuery);
+    const { data: stats } = useSuspenseQuery(serverStatsQuery);
     const { data: config } = useSuspenseQuery(configQuery);
 
     // Lists can be long, so they take the full row, wrap, and scroll past a few lines.
