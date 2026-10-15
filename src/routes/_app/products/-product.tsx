@@ -230,19 +230,20 @@ export function ProductDetails({ product }: { product: Product }) {
                 )}
 
                 {!!license?.meterAttributes?.length && (
-                    <InfoPanel
-                        title="Usage Limits"
-                        hint="Countable usage this license allows, such as API calls, exports or credits."
-                    >
-                        <InfoGrid>
-                            {license.meterAttributes.map(meter => (
-                                <InfoItem
-                                    key={meter.id}
-                                    label={meter.name}
-                                    value={`${meter.totalUses} / ${limit(meter.allowedUses)}`}
-                                />
-                            ))}
-                        </InfoGrid>
+                    <InfoPanel title="Usage Limits" flush>
+                        <InfoTable
+                            rows={license.meterAttributes}
+                            rowKey={meter => meter.id}
+                            columns={[
+                                { label: 'Name', render: meter => meter.name },
+                                // Floating meters count uses held by live devices, so the figure can fall (SERVER.md §8.3).
+                                {
+                                    label: 'Used',
+                                    render: meter => `${meter.totalUses} / ${limit(meter.allowedUses)}`,
+                                },
+                                { label: 'Lifetime Usage', render: meter => meter.grossUses },
+                            ]}
+                        />
                     </InfoPanel>
                 )}
             </div>
