@@ -2,13 +2,23 @@ import { Button } from '@cryptlex/web-components/components/button';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, createLink } from '@tanstack/react-router';
 import { InfoGrid, InfoItem } from '@/components/info-panel';
+import { m } from '@/paraglide/messages.js';
 import { date, limit, ProductDetails, ProductHeader, productsQuery } from './-product';
 
 const ButtonLink = createLink(Button);
 
 export const Route = createFileRoute('/_app/products/')({
     loader: ({ context }) => context.queryClient.query(productsQuery),
-    head: ({ match }) => ({ meta: [{ title: `Products - ${match.context.branding.appName}` }] }),
+    head: ({ match }) => ({
+        meta: [
+            {
+                title: m['common.pageTitle']({
+                    title: m['productsPage.pageTitle'](),
+                    appName: match.context.branding.appName ?? '',
+                }),
+            },
+        ],
+    }),
     component: ProductsPage,
 });
 
@@ -26,13 +36,13 @@ function ProductsPage() {
                         {product.status !== 'not_activated' && product.enabled && (
                             <InfoGrid>
                                 <InfoItem
-                                    label="Concurrent Seats"
-                                    hint="Devices holding a seat right now, out of the maximum allowed at the same time. A device frees its seat when the app closes or its lease runs out."
+                                    label={m['allowedFloatingClients.label']()}
+                                    hint={m['allowedFloatingClients.hint']()}
                                     value={`${product.totalFloatingClients} / ${limit(product.allowedFloatingClients)}`}
                                 />
                                 <InfoItem
-                                    label="Expires"
-                                    hint="The license stops working after this date. Renewing the subscription moves the date forward."
+                                    label={m['expiresAt.label']()}
+                                    hint={m['expiresAt.hint']()}
                                     value={date(product.expiresAt)}
                                 />
                             </InfoGrid>
@@ -41,11 +51,11 @@ function ProductsPage() {
                             {product.status === 'not_activated' && (
                                 // TODO: activation flow.
                                 <Button variant="primary" size="sm">
-                                    Activate
+                                    {m['productsPage.action.activate']()}
                                 </Button>
                             )}
                             <ButtonLink to="/products/$productId" params={{ productId: product.id }} size="sm">
-                                View
+                                {m['common.action.view']()}
                             </ButtonLink>
                         </footer>
                     </article>

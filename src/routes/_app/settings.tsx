@@ -3,6 +3,7 @@ import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { InfoGrid, InfoItem, InfoPanel } from '@/components/info-panel';
 import { apiFetch } from '@/lib/api';
+import { m } from '@/paraglide/messages.js';
 import type { ServerConfig, ServerStats } from '@/types';
 
 const statsQuery = queryOptions({
@@ -18,7 +19,16 @@ const configQuery = queryOptions({
 export const Route = createFileRoute('/_app/settings')({
     loader: ({ context }) =>
         Promise.all([context.queryClient.query(statsQuery), context.queryClient.query(configQuery)]),
-    head: ({ match }) => ({ meta: [{ title: `Settings - ${match.context.branding.appName}` }] }),
+    head: ({ match }) => ({
+        meta: [
+            {
+                title: m['common.pageTitle']({
+                    title: m['settingsPage.pageTitle'](),
+                    appName: match.context.branding.appName ?? '',
+                }),
+            },
+        ],
+    }),
     component: SettingsPage,
 });
 
@@ -29,7 +39,7 @@ function SettingsPage() {
     // Lists can be long, so they take the full row, wrap, and scroll past a few lines.
     const list = (values: string[]) =>
         values.length === 0 ? (
-            'None'
+            m['common.state.none']()
         ) : (
             <div className="flex max-h-32 flex-wrap gap-1 overflow-y-auto">
                 {values.map(value => (
@@ -42,54 +52,77 @@ function SettingsPage() {
 
     return (
         <div className="grid grid-cols-1 gap-icon md:grid-cols-2">
-            <InfoPanel title="Server">
+            <InfoPanel title={m['settingsPage.sections.server.title']()}>
                 <InfoGrid>
-                    <InfoItem label="Version" value={stats.version} mono />
-                    <InfoItem label="Port" value={config.server.port} mono />
-                    <InfoItem label="Host" value={config.server.cryptlexHost || 'Default'} mono />
+                    <InfoItem label={m['version.label']()} value={stats.version} mono />
+                    <InfoItem label={m['port.label']()} value={config.server.port} mono />
                     <InfoItem
-                        label="Lease Duration"
-                        hint="How long a device can hold a seat without checking in. Products use this unless they override it. If the app closes without releasing its seat, for example after a crash, the seat becomes free when the lease runs out."
-                        value={`${config.productDefaults.leaseDuration} seconds`}
+                        label={m['cryptlexHost.label']()}
+                        value={config.server.cryptlexHost || m['common.state.default']()}
+                        mono
                     />
                     <InfoItem
-                        label="Allowed Clock Offset"
-                        hint="How far a device's clock can differ from this server's before its requests are refused."
-                        value={`${config.server.allowedClockOffset} seconds`}
+                        label={m['leaseDuration.label']()}
+                        hint={m['leaseDuration.hint']()}
+                        value={m['common.unit.seconds']({ count: config.productDefaults.leaseDuration })}
+                    />
+                    <InfoItem
+                        label={m['allowedClockOffset.label']()}
+                        hint={m['allowedClockOffset.hint']()}
+                        value={m['common.unit.seconds']({ count: config.server.allowedClockOffset })}
                     />
                 </InfoGrid>
             </InfoPanel>
-            <InfoPanel title="Configuration">
+            <InfoPanel title={m['settingsPage.sections.configuration.title']()}>
                 <InfoGrid>
-                    <InfoItem label="SSL" value={config.ssl.enabled ? 'Enabled' : 'Disabled'} />
-                    <InfoItem label="Admin Users" value={config.auth.admins.join(', ') || '—'} />
                     <InfoItem
-                        label="Blocked IPs"
-                        hint="IP addresses refused by this server."
+                        label={m['ssl.label']()}
+                        value={config.ssl.enabled ? m['common.state.enabled']() : m['common.state.disabled']()}
+                    />
+                    <InfoItem label={m['admins.label']()} value={config.auth.admins.join(', ') || '—'} />
+                    <InfoItem
+                        label={m['blockedIps.label']()}
+                        hint={m['blockedIps.hint']()}
                         value={list(config.server.blockedIps)}
                         className="sm:col-span-2"
                     />
                     <InfoItem
-                        label="Trusted Proxies"
-                        hint="Proxies whose forwarded client IP this server accepts."
+                        label={m['trustedProxies.label']()}
+                        hint={m['trustedProxies.hint']()}
                         value={list(config.proxy.trustedProxies)}
                         className="sm:col-span-2"
                     />
                 </InfoGrid>
             </InfoPanel>
-            <InfoPanel title="Logging">
+            <InfoPanel title={m['settingsPage.sections.logging.title']()}>
                 <InfoGrid>
                     <InfoItem
-                        label="Log Level"
-                        value={['Debug', 'Information', 'Warning', 'Error'][config.logging.logLevel]}
+                        label={m['logLevel.label']()}
+                        value={[
+                            m['logLevel.debug.label'],
+                            m['logLevel.information.label'],
+                            m['logLevel.warning.label'],
+                            m['logLevel.error.label'],
+                        ][config.logging.logLevel]?.()}
                     />
-                    <InfoItem label="Console Logs" value={config.logging.console.enabled ? 'Enabled' : 'Disabled'} />
-                    <InfoItem label="File Logs" value={config.logging.file.enabled ? 'Enabled' : 'Disabled'} />
+                    <InfoItem
+                        label={m['consoleLogs.label']()}
+                        value={
+                            config.logging.console.enabled ? m['common.state.enabled']() : m['common.state.disabled']()
+                        }
+                    />
+                    <InfoItem
+                        label={m['fileLogs.label']()}
+                        value={config.logging.file.enabled ? m['common.state.enabled']() : m['common.state.disabled']()}
+                    />
                     {config.logging.file.enabled && (
                         <>
-                            <InfoItem label="Log Directory" value={config.logging.file.directory} mono />
-                            <InfoItem label="Max File Size" value={`${config.logging.file.maxSize} MB`} />
-                            <InfoItem label="Max Backups" value={config.logging.file.maxBackups} />
+                            <InfoItem label={m['logDirectory.label']()} value={config.logging.file.directory} mono />
+                            <InfoItem
+                                label={m['maxFileSize.label']()}
+                                value={m['common.unit.megabytes']({ count: config.logging.file.maxSize })}
+                            />
+                            <InfoItem label={m['maxBackups.label']()} value={config.logging.file.maxBackups} />
                         </>
                     )}
                 </InfoGrid>

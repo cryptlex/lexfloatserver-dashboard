@@ -1,4 +1,5 @@
 import { jwtDecode } from 'jwt-decode';
+import { m } from '@/paraglide/messages.js';
 
 /** localStorage key for the access token. Kept the same as the old dashboard so existing sessions carry over. */
 const ACCESS_TOKEN_KEY = 'accessToken';
@@ -14,7 +15,7 @@ export class ApiError extends Error {
         readonly code: string | undefined,
         message: string | undefined
     ) {
-        super(message ?? `Request failed with status ${status}`);
+        super(message ?? m['common.error.requestFailed']({ status }));
     }
 }
 

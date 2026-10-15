@@ -1,0 +1,237 @@
+{
+    "$schema": "https://inlang.com/schema/inlang-message-format",
+    "common": {
+        "pageTitle": "{title} - {appName}",
+        "state": {
+            "enabled": "Enabled",
+            "disabled": "Disabled",
+            "none": "None",
+            "default": "Default",
+            "unlimited": "Unlimited",
+            "online": "Online",
+            "offline": "Offline"
+        },
+        "unit": {
+            "seconds": "{count} seconds",
+            "megabytes": "{count} MB"
+        },
+        "action": {
+            "view": "View"
+        },
+        "error": {
+            "requestFailed": "Request failed with status {status}"
+        }
+    },
+    "nav": {
+        "products": "Products",
+        "devices": "Devices",
+        "settings": "Settings",
+        "signOut": "Sign out"
+    },
+    "username": {
+        "label": "Username"
+    },
+    "password": {
+        "label": "Password"
+    },
+    "status": {
+        "label": "Status"
+    },
+    "license": {
+        "label": "License",
+        "status": {
+            "ok": {
+                "label": "Active",
+                "hint": "This license is valid and can be used on activated devices."
+            },
+            "notActivated": {
+                "label": "Not activated",
+                "hint": "This server hasn't activated a license for this product yet, so it can't hand out seats."
+            },
+            "expired": {
+                "label": "Expired",
+                "hint": "This license has passed its expiry date and no longer works until it is renewed."
+            },
+            "suspended": {
+                "label": "Suspended",
+                "hint": "This license is temporarily paused. It starts working again on its own once the software vendor lifts the suspension."
+            },
+            "gracePeriodOver": {
+                "label": "Grace period over",
+                "hint": "This server couldn't sync with Cryptlex in time, so it stopped handing out seats until it syncs again."
+            },
+            "disabled": {
+                "label": "Disabled",
+                "hint": "This product is turned off in config.yml, so this server does not serve it."
+            }
+        }
+    },
+    "key": {
+        "label": "License Key"
+    },
+    "allowedFloatingClients": {
+        "label": "Concurrent Seats",
+        "hint": "Devices holding a seat right now, out of the maximum allowed at the same time. A device frees its seat when the app closes or its lease runs out."
+    },
+    "totalOfflineFloatingClients": {
+        "label": "Offline Devices",
+        "hint": "Devices holding a seat through an offline lease, so they don't need to reach this server until the lease ends."
+    },
+    "expiresAt": {
+        "label": "Expires",
+        "hint": "The license stops working after this date. Renewing the subscription moves the date forward."
+    },
+    "serverSyncGracePeriodExpiresAt": {
+        "label": "Sync Grace Period Ends",
+        "hint": "If this server can't reach Cryptlex to sync the license, it keeps handing out seats until this time."
+    },
+    "leasingStrategy": {
+        "label": "Leasing Strategy",
+        "hint": "How seats are counted: per machine gives each device one seat, per instance gives each running copy of the app its own seat."
+    },
+    "activationMode": {
+        "label": "Activation Method",
+        "online": {
+            "hint": "Activated over the internet. Changes to the license reach this server automatically when it syncs."
+        },
+        "offline": {
+            "hint": "Activated without internet using a response file. This server doesn't sync, so changes to the license don't reach it until it's activated again."
+        }
+    },
+    "createdAt": {
+        "label": "Created"
+    },
+    "activatedAt": {
+        "label": "Activated"
+    },
+    "user": {
+        "label": "User"
+    },
+    "organization": {
+        "label": "Organization"
+    },
+    "featureEntitlements": {
+        "label": "Features",
+        "hint": "Features this license unlocks, with the value or expiry date that applies to each, if any.",
+        "featureName": {
+            "label": "Feature"
+        },
+        "value": {
+            "label": "Value"
+        }
+    },
+    "meterAttributes": {
+        "label": "Usage Limits",
+        "name": {
+            "label": "Name"
+        },
+        "uses": {
+            "label": "Used"
+        },
+        "grossUses": {
+            "label": "Lifetime Usage"
+        }
+    },
+    "version": {
+        "label": "Version"
+    },
+    "port": {
+        "label": "Port"
+    },
+    "cryptlexHost": {
+        "label": "Host"
+    },
+    "leaseDuration": {
+        "label": "Lease Duration",
+        "hint": "How long a device can hold a seat without checking in. Products use this unless they override it. If the app closes without releasing its seat, for example after a crash, the seat becomes free when the lease runs out."
+    },
+    "allowedClockOffset": {
+        "label": "Allowed Clock Offset",
+        "hint": "How far a device's clock can differ from this server's before its requests are refused."
+    },
+    "ssl": {
+        "label": "SSL"
+    },
+    "admins": {
+        "label": "Admin Users"
+    },
+    "blockedIps": {
+        "label": "Blocked IPs",
+        "hint": "IP addresses refused by this server."
+    },
+    "trustedProxies": {
+        "label": "Trusted Proxies",
+        "hint": "Proxies whose forwarded client IP this server accepts."
+    },
+    "logLevel": {
+        "label": "Log Level",
+        "debug": {
+            "label": "Debug"
+        },
+        "information": {
+            "label": "Information"
+        },
+        "warning": {
+            "label": "Warning"
+        },
+        "error": {
+            "label": "Error"
+        }
+    },
+    "consoleLogs": {
+        "label": "Console Logs"
+    },
+    "fileLogs": {
+        "label": "File Logs"
+    },
+    "logDirectory": {
+        "label": "Log Directory"
+    },
+    "maxFileSize": {
+        "label": "Max File Size"
+    },
+    "maxBackups": {
+        "label": "Max Backups"
+    },
+    "authPage": {
+        "login": {
+            "pageTitle": "Sign in",
+            "title": "Sign in",
+            "description": "Sign in to manage {appName}.",
+            "action": {
+                "submit": "Sign in"
+            }
+        }
+    },
+    "productsPage": {
+        "pageTitle": "Products",
+        "action": {
+            "activate": "Activate",
+            "forceSync": "Force Sync",
+            "deactivate": "Deactivate"
+        },
+        "sections": {
+            "overview": {
+                "title": "Overview"
+            }
+        }
+    },
+    "devicesPage": {
+        "pageTitle": "Devices",
+        "title": "Devices"
+    },
+    "settingsPage": {
+        "pageTitle": "Settings",
+        "sections": {
+            "server": {
+                "title": "Server"
+            },
+            "configuration": {
+                "title": "Configuration"
+            },
+            "logging": {
+                "title": "Logging"
+            }
+        }
+    }
+}

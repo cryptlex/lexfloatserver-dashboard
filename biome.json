@@ -3,7 +3,7 @@
     "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true, "defaultBranch": "main" },
     "files": {
         "ignoreUnknown": false,
-        "includes": ["**", "!**/routeTree.gen.ts", "!public"]
+        "includes": ["**", "!**/routeTree.gen.ts", "!public", "!src/paraglide", "!project.inlang"]
     },
     "formatter": {
         "enabled": true,

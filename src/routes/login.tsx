@@ -7,6 +7,7 @@ import { V_STRING_REQUIRED } from '@cryptlex/web-components/utilities/validators
 import { useMutation } from '@tanstack/react-query';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
 import { apiFetch, isLoggedIn, setAccessToken } from '@/lib/api';
+import { m } from '@/paraglide/messages.js';
 import type { AccessTokenResponse, LoginRequest } from '@/types';
 
 export const Route = createFileRoute('/login')({
@@ -14,7 +15,14 @@ export const Route = createFileRoute('/login')({
         if (isLoggedIn()) throw redirect({ to: '/' });
     },
     head: ({ match }) => ({
-        meta: [{ title: `Sign in - ${match.context.branding.appName}` }],
+        meta: [
+            {
+                title: m['common.pageTitle']({
+                    title: m['authPage.login.pageTitle'](),
+                    appName: match.context.branding.appName ?? '',
+                }),
+            },
+        ],
     }),
     component: LoginPage,
 });
@@ -41,15 +49,17 @@ function LoginPage() {
         <main className="flex min-h-screen w-full items-center justify-center px-4">
             <Card className="w-full md:max-w-md">
                 <CardHeader>
-                    <CardTitle>Sign in</CardTitle>
-                    <CardDescription>Sign in to manage {branding.appName}.</CardDescription>
+                    <CardTitle>{m['authPage.login.title']()}</CardTitle>
+                    <CardDescription>
+                        {m['authPage.login.description']({ appName: branding.appName ?? '' })}
+                    </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Form onSubmit={() => form.handleSubmit()} className="flex flex-col gap-icon">
                         <form.AppField name="username" validators={{ onBlur: V_STRING_REQUIRED }}>
                             {field => (
                                 <field.TfTextField
-                                    label="Username"
+                                    label={m['username.label']()}
                                     autoComplete="username"
                                     autoFocus
                                     inputClassName="bg-surface-secondary"
@@ -59,7 +69,7 @@ function LoginPage() {
                         <form.AppField name="password" validators={{ onBlur: V_STRING_REQUIRED }}>
                             {field => (
                                 <field.TfTextField
-                                    label="Password"
+                                    label={m['password.label']()}
                                     type="password"
                                     autoComplete="current-password"
                                     inputClassName="bg-surface-secondary"
@@ -70,7 +80,7 @@ function LoginPage() {
                         {login.error && <Alert variant="destructive">{login.error.message}</Alert>}
 
                         <Button type="submit" variant="primary" isPending={login.isPending}>
-                            Sign in
+                            {m['authPage.login.action.submit']()}
                         </Button>
                     </Form>
                 </CardContent>

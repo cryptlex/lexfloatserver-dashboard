@@ -16,6 +16,7 @@ import {
 } from '@cryptlex/web-components/components/sidebar';
 import { createFileRoute, createLink, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { isLoggedIn, removeAccessToken } from '@/lib/api';
+import { m } from '@/paraglide/messages.js';
 
 const SidebarLink = createLink(SidebarMenuButton);
 
@@ -42,17 +43,17 @@ function AppLayout() {
                         <SidebarMenu>
                             <SidebarMenuItem>
                                 <SidebarLink to="/products" icon={IcProduct} activeProps={{ isActive: true }}>
-                                    Products
+                                    {m['nav.products']()}
                                 </SidebarLink>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarLink to="/devices" icon={IcActivation} activeProps={{ isActive: true }}>
-                                    Devices
+                                    {m['nav.devices']()}
                                 </SidebarLink>
                             </SidebarMenuItem>
                             <SidebarMenuItem>
                                 <SidebarLink to="/settings" icon={IcSettings} activeProps={{ isActive: true }}>
-                                    Settings
+                                    {m['nav.settings']()}
                                 </SidebarLink>
                             </SidebarMenuItem>
                         </SidebarMenu>
@@ -69,7 +70,7 @@ function AppLayout() {
                                     navigate({ to: '/login' });
                                 }}
                             >
-                                Sign out
+                                {m['nav.signOut']()}
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>

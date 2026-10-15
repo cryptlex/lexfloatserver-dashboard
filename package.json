@@ -8,7 +8,7 @@
     "packageManager": "pnpm@12.11.0",
     "scripts": {
         "dev": "vite",
-        "build": "tsc -b && vite build",
+        "build": "vite build && tsc -b",
         "preview": "vite preview",
         "lint": "biome lint .",
         "lint:fix": "biome lint --write .",
@@ -35,6 +35,7 @@
     },
     "devDependencies": {
         "@biomejs/biome": "2.5.10",
+        "@inlang/paraglide-js": "2.25.0",
         "@tanstack/react-query-devtools": "5.102.7",
         "@tanstack/react-router-devtools": "1.167.1",
         "@tanstack/router-plugin": "1.168.35",
