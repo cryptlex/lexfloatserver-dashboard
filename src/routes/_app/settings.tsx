@@ -2,14 +2,13 @@ import { Badge } from '@cryptlex/web-components/components/badge';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { InfoGrid, InfoItem, InfoPanel } from '@/components/info-panel';
-import { apiFetch } from '@/lib/api';
+import { client } from '@/lib/api';
 import { serverStatsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
-import type { ServerConfig } from '@/types';
 
 const configQuery = queryOptions({
-    queryKey: ['server', 'config'],
-    queryFn: () => apiFetch<ServerConfig>('/api/v4/server/config'),
+    queryKey: ['get', '/api/v4/server/config'],
+    queryFn: async () => (await client.GET('/api/v4/server/config')).data!,
 });
 
 export const Route = createFileRoute('/_app/settings')({
@@ -50,7 +49,7 @@ function SettingsPage() {
         <div className="grid grid-cols-1 gap-icon md:grid-cols-2">
             <InfoPanel title={m['settingsPage.sections.server.title']()}>
                 <InfoGrid>
-                    <InfoItem label={m['version.label']()} value={stats.version} mono />
+                    <InfoItem label={m['version.label']()} value={stats?.version} mono />
                     <InfoItem label={m['port.label']()} value={config.server.port} mono />
                     <InfoItem
                         label={m['cryptlexHost.label']()}

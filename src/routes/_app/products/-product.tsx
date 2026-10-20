@@ -1,35 +1,53 @@
 import { Badge } from '@cryptlex/web-components/components/badge';
 import { Button } from '@cryptlex/web-components/components/button';
 import { CopyButton } from '@cryptlex/web-components/components/copy-button';
+import { ProgressBar } from '@cryptlex/web-components/components/progress-bar';
 import { formatDate } from '@cryptlex/web-components/utilities/date';
+import type { ApiQuery, ApiSchema } from '@cryptlex/web-components/utilities/resources';
 import { queryOptions } from '@tanstack/react-query';
+import { useRouteContext } from '@tanstack/react-router';
 import type React from 'react';
 import { CardAvatar } from '@/components/card-avatar';
 import { InfoGrid, InfoItem, InfoPanel, InfoTable } from '@/components/info-panel';
-import { apiFetch } from '@/lib/api';
+import { client } from '@/lib/api';
 import { m } from '@/paraglide/messages.js';
-import type { Page, Product } from '@/types';
+import { ActivateDialog } from './-activate-dialog';
+import { DeactivateDialog } from './-deactivate-dialog';
 
-// Every expansion, so one call is enough to render a product's full details.
-const EXPAND = 'license.meterAttributes,license.featureEntitlements,license.metadata,metadata';
+type Product = ApiSchema<'Product'>;
+
+// Every sub-resource, so one call is enough to render a product's full details.
+const INCLUDE = [
+    'license.meterAttributes',
+    'license.featureEntitlements',
+    'license.metadata',
+    'metadata',
+] as const satisfies ApiQuery<'listProducts'>['include'];
 
 export const productsQuery = queryOptions({
-    queryKey: ['products'],
-    queryFn: () => apiFetch<Page<Product>>(`/api/v4/products?limit=100&expand=${EXPAND}`),
+    queryKey: ['get', '/api/v4/products'],
+    queryFn: async () =>
+        (await client.GET('/api/v4/products', { params: { query: { limit: 100, include: [...INCLUDE] } } }))?.data,
 });
 
 export const productQuery = (productId: string) =>
     queryOptions({
-        queryKey: ['products', productId],
-        queryFn: () =>
-            apiFetch<Page<Product>>(
-                `/api/v4/products?productId=${encodeURIComponent(productId)}&expand=${EXPAND}`
-            ).then(page => page.items[0] ?? null),
+        queryKey: ['get', '/api/v4/products', productId],
+        queryFn: async () => {
+            const { data } = await client.GET('/api/v4/products', {
+                params: { query: { id: productId, include: [...INCLUDE] } },
+            });
+            return data?.[0] ?? null;
+        },
     });
 
 export const STATUS: Record<
     Product['status'],
-    { label: () => string; hint: () => string; variant: React.ComponentProps<typeof Badge>['variant'] }
+    {
+        label: () => string;
+        hint: (inputs: { appName: string }) => string;
+        variant: React.ComponentProps<typeof Badge>['variant'];
+    }
 > = {
     ok: { label: m['license.status.ok.label'], hint: m['license.status.ok.hint'], variant: 'success' },
     not_activated: {
@@ -64,6 +82,21 @@ export const date = (seconds: number) => (seconds ? formatDate(new Date(seconds 
 /** -1 in a limit means unlimited. */
 export const limit = (value: number) => (value === -1 ? m['common.state.unlimited']() : value);
 
+/** Seats in use against the limit, as a progress bar unless the limit is unlimited. */
+export function seats(product: Product) {
+    const label = `${product.totalFloatingClients} / ${limit(product.allowedFloatingClients)}`;
+    if (product.allowedFloatingClients === -1) return label;
+    return (
+        <ProgressBar
+            minValue={0}
+            maxValue={product.allowedFloatingClients}
+            value={product.totalFloatingClients}
+            meterClassName="w-25"
+            label={label}
+        />
+    );
+}
+
 export function ProductHeader({
     product,
     as: Heading = 'h2',
@@ -96,6 +129,7 @@ export function ProductHeader({
 export function ProductDetails({ product }: { product: Product }) {
     const { license } = product;
     const isActivated = license && license.status !== 'not_activated';
+    const appName = useRouteContext({ from: '__root__' }).branding.appName ?? '';
 
     return (
         <article className="flex flex-col gap-icon">
@@ -108,12 +142,15 @@ export function ProductDetails({ product }: { product: Product }) {
                     isActivated ? (
                         <>
                             <Button>{m['productsPage.action.forceSync']()}</Button>
-                            <Button variant="destructive_neutral">{m['productsPage.action.deactivate']()}</Button>
+                            {license.activationMode.current === 'offline' ? (
+                                // TODO: offline deactivation flow.
+                                <Button variant="destructive_neutral">{m['productsPage.action.deactivate']()}</Button>
+                            ) : (
+                                <DeactivateDialog product={product} licenseKey={license.key} />
+                            )}
                         </>
                     ) : (
-                        product.status === 'not_activated' && (
-                            <Button variant="primary">{m['productsPage.action.activate']()}</Button>
-                        )
+                        product.status === 'not_activated' && <ActivateDialog product={product} />
                     )
                 }
             />
@@ -124,7 +161,7 @@ export function ProductDetails({ product }: { product: Product }) {
                         <InfoItem
                             label={m['allowedFloatingClients.label']()}
                             hint={m['allowedFloatingClients.hint']()}
-                            value={`${product.totalFloatingClients} / ${limit(product.allowedFloatingClients)}`}
+                            value={seats(product)}
                         />
                         <InfoItem
                             label={m['totalOfflineFloatingClients.label']()}
@@ -138,7 +175,7 @@ export function ProductDetails({ product }: { product: Product }) {
                         />
                         <InfoItem
                             label={m['serverSyncGracePeriodExpiresAt.label']()}
-                            hint={m['serverSyncGracePeriodExpiresAt.hint']()}
+                            hint={m['serverSyncGracePeriodExpiresAt.hint']({ appName })}
                             value={date(product.serverSyncGracePeriodExpiresAt)}
                         />
                         {product.metadata?.map(item => (
@@ -151,7 +188,7 @@ export function ProductDetails({ product }: { product: Product }) {
                     <InfoGrid>
                         <InfoItem
                             label={m['status.label']()}
-                            hint={STATUS[product.status].hint()}
+                            hint={STATUS[product.status].hint({ appName })}
                             value={
                                 <Badge variant={STATUS[product.status].variant}>{STATUS[product.status].label()}</Badge>
                             }

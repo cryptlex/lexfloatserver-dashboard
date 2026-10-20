@@ -16,13 +16,15 @@
             "megabytes": "{count} MB"
         },
         "action": {
-            "view": "View"
+            "view": "View",
+            "cancel": "Cancel"
         },
         "error": {
             "requestFailed": "Request failed with status {status}"
         }
     },
     "nav": {
+        "server": "Server",
         "products": "Products",
         "devices": "Devices",
         "settings": "Settings",
@@ -58,7 +60,7 @@
             },
             "gracePeriodOver": {
                 "label": "Grace period over",
-                "hint": "This server couldn't sync with Cryptlex in time, so it stopped handing out seats until it syncs again."
+                "hint": "This server couldn't sync with {appName} in time, so it stopped handing out seats until it syncs again."
             },
             "disabled": {
                 "label": "Disabled",
@@ -83,7 +85,7 @@
     },
     "serverSyncGracePeriodExpiresAt": {
         "label": "Sync Grace Period Ends",
-        "hint": "If this server can't reach Cryptlex to sync the license, it keeps handing out seats until this time."
+        "hint": "If this server can't reach {appName} to sync the license, it keeps handing out seats until this time."
     },
     "leasingStrategy": {
         "label": "Leasing Strategy",
@@ -223,11 +225,69 @@
                     "description": "{count} offline"
                 }
             }
+        },
+        "activateHint": "This product isn’t activated yet. Select Activate to activate its license online or offline.",
+        "activateDialog": {
+            "title": "Activate {product}",
+            "description": "Enter the license key you received for this product. This server needs internet access to reach {appName}.",
+            "toast": {
+                "success": "{product} activated"
+            }
+        },
+        "deactivateDialog": {
+            "title": "Deactivate {product}?",
+            "description": "This server stops handing out seats for this product, and devices using it lose their seats when their leases end. You can activate it again later with the same license key.",
+            "confirmLabel": "Type the license key to confirm",
+            "error": {
+                "outstandingOffline": "Some devices still hold offline seats. Wait for their leases to end, or return them, before deactivating.",
+                "keyMismatch": "This doesn't match the license key this product is activated with."
+            },
+            "toast": {
+                "success": "{product} deactivated"
+            }
         }
     },
     "devicesPage": {
         "pageTitle": "Devices",
-        "title": "Devices"
+        "title": "Devices",
+        "searchPlaceholder": "Search by hostname and IP address",
+        "action": {
+            "view": "View"
+        },
+        "columns": {
+            "hostname": "Hostname",
+            "product": "Product",
+            "ipAddress": "IP address",
+            "os": "Operating system",
+            "osUser": "OS user",
+            "lease": "Lease",
+            "clientVersion": "Client version",
+            "lastSeenAt": "Last seen",
+            "leaseExpiresAt": "Lease expires",
+            "firstSeenAt": "First seen"
+        },
+        "details": {
+            "sections": {
+                "device": {
+                    "title": "Device"
+                },
+                "lease": {
+                    "title": "Lease"
+                },
+                "metadata": {
+                    "title": "Metadata"
+                }
+            },
+            "lease": {
+                "hint": "Online leases are renewed while the app runs. Offline leases let the device keep its seat without reaching this server until the lease expires."
+            },
+            "lastSeenAt": {
+                "hint": "When the device last renewed its lease."
+            },
+            "meterAttributes": {
+                "hint": "Uses held by this device only."
+            }
+        }
     },
     "settingsPage": {
         "pageTitle": "Settings",

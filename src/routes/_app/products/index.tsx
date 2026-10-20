@@ -1,10 +1,12 @@
 import { Button } from '@cryptlex/web-components/components/button';
+import { IcEye } from '@cryptlex/web-components/components/icons';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, createLink } from '@tanstack/react-router';
 import { InfoGrid, InfoItem } from '@/components/info-panel';
 import { serverStatsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
-import { date, limit, ProductDetails, ProductHeader, productsQuery } from './-product';
+import { ActivateDialog } from './-activate-dialog';
+import { date, ProductDetails, ProductHeader, productsQuery, seats } from './-product';
 
 const ButtonLink = createLink(Button);
 
@@ -28,15 +30,15 @@ function ProductsPage() {
     const { data: products } = useSuspenseQuery(productsQuery);
     const { data: stats } = useSuspenseQuery(serverStatsQuery);
 
-    if (products.items.length === 1) return <ProductDetails product={products.items[0]} />;
+    if (products?.length === 1) return <ProductDetails product={products[0]} />;
 
     const tiles = [
-        { label: m['productsPage.sections.stats.products.label'](), value: stats.productCount },
+        { label: m['productsPage.sections.stats.products.label'](), value: stats?.productCount },
         {
             label: m['productsPage.sections.stats.devices.label'](),
-            value: stats.totalFloatingClients,
+            value: stats?.totalFloatingClients,
             description: m['productsPage.sections.stats.devices.description']({
-                count: stats.totalOfflineFloatingClients,
+                count: stats?.totalOfflineFloatingClients ?? 0,
             }),
         },
     ];
@@ -55,7 +57,7 @@ function ProductsPage() {
                 ))}
             </dl>
             <ul className="grid grid-cols-1 gap-icon sm:grid-cols-2">
-                {products.items.map(product => (
+                {products?.map(product => (
                     <li key={product.id}>
                         <article className="flex h-full flex-col gap-3 rounded-lg border bg-surface-primary p-4">
                             <ProductHeader product={product} />
@@ -64,7 +66,7 @@ function ProductsPage() {
                                     <InfoItem
                                         label={m['allowedFloatingClients.label']()}
                                         hint={m['allowedFloatingClients.hint']()}
-                                        value={`${product.totalFloatingClients} / ${limit(product.allowedFloatingClients)}`}
+                                        value={seats(product)}
                                     />
                                     <InfoItem
                                         label={m['expiresAt.label']()}
@@ -73,16 +75,17 @@ function ProductsPage() {
                                     />
                                 </InfoGrid>
                             )}
+                            {product.status === 'not_activated' && (
+                                <p className="text-sm text-text-secondary">{m['productsPage.activateHint']()}</p>
+                            )}
                             <footer className="mt-auto flex justify-end gap-icon">
-                                {product.status === 'not_activated' && (
-                                    // TODO: activation flow.
-                                    <Button variant="primary" size="sm">
-                                        {m['productsPage.action.activate']()}
-                                    </Button>
+                                {product.status === 'not_activated' && <ActivateDialog product={product} />}
+                                {product.status !== 'not_activated' && (
+                                    <ButtonLink to="/products/$productId" params={{ productId: product.id }}>
+                                        <IcEye />
+                                        {m['common.action.view']()}
+                                    </ButtonLink>
                                 )}
-                                <ButtonLink to="/products/$productId" params={{ productId: product.id }} size="sm">
-                                    {m['common.action.view']()}
-                                </ButtonLink>
                             </footer>
                         </article>
                     </li>

@@ -4,6 +4,8 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarGroup,
+    SidebarGroupContent,
+    SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
@@ -20,6 +22,8 @@ import { m } from '@/paraglide/messages.js';
 
 const SidebarLink = createLink(SidebarMenuButton);
 
+const DEFAULT_LOGO_URL = '/cryptlex-icon-logo.svg';
+
 /** Layout for every signed-in page: anyone without a valid token is sent to the login page. */
 export const Route = createFileRoute('/_app')({
     beforeLoad: () => {
@@ -35,28 +39,31 @@ function AppLayout() {
     return (
         <SidebarProvider>
             <Sidebar className="h-screen">
-                <SidebarHeader logo={<img src="/cryptlex-logo.svg" alt="" className="p-1" />}>
+                <SidebarHeader logo={<img src={branding.logoUrl ?? DEFAULT_LOGO_URL} alt="" className="p-1" />}>
                     {branding.appName}
                 </SidebarHeader>
                 <SidebarContent>
                     <SidebarGroup>
-                        <SidebarMenu>
-                            <SidebarMenuItem>
-                                <SidebarLink to="/products" icon={IcProduct} activeProps={{ isActive: true }}>
-                                    {m['nav.products']()}
-                                </SidebarLink>
-                            </SidebarMenuItem>
-                            <SidebarMenuItem>
-                                <SidebarLink to="/devices" icon={IcActivation} activeProps={{ isActive: true }}>
-                                    {m['nav.devices']()}
-                                </SidebarLink>
-                            </SidebarMenuItem>
-                            <SidebarMenuItem>
-                                <SidebarLink to="/settings" icon={IcSettings} activeProps={{ isActive: true }}>
-                                    {m['nav.settings']()}
-                                </SidebarLink>
-                            </SidebarMenuItem>
-                        </SidebarMenu>
+                        <SidebarGroupLabel>{m['nav.server']()}</SidebarGroupLabel>
+                        <SidebarGroupContent>
+                            <SidebarMenu>
+                                <SidebarMenuItem>
+                                    <SidebarLink to="/products" icon={IcProduct} activeProps={{ isActive: true }}>
+                                        {m['nav.products']()}
+                                    </SidebarLink>
+                                </SidebarMenuItem>
+                                <SidebarMenuItem>
+                                    <SidebarLink to="/devices" icon={IcActivation} activeProps={{ isActive: true }}>
+                                        {m['nav.devices']()}
+                                    </SidebarLink>
+                                </SidebarMenuItem>
+                                <SidebarMenuItem>
+                                    <SidebarLink to="/settings" icon={IcSettings} activeProps={{ isActive: true }}>
+                                        {m['nav.settings']()}
+                                    </SidebarLink>
+                                </SidebarMenuItem>
+                            </SidebarMenu>
+                        </SidebarGroupContent>
                     </SidebarGroup>
                 </SidebarContent>
                 <SidebarFooter>

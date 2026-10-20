@@ -3,12 +3,12 @@ import { Button } from '@cryptlex/web-components/components/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@cryptlex/web-components/components/card';
 import { Form } from '@cryptlex/web-components/components/form';
 import { useAppForm } from '@cryptlex/web-components/utilities/form-hook';
+import type { ApiSchema } from '@cryptlex/web-components/utilities/resources';
 import { V_STRING_REQUIRED } from '@cryptlex/web-components/utilities/validators';
 import { useMutation } from '@tanstack/react-query';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
-import { apiFetch, isLoggedIn, setAccessToken } from '@/lib/api';
+import { client, isLoggedIn, setAccessToken } from '@/lib/api';
 import { m } from '@/paraglide/messages.js';
-import type { AccessTokenResponse, LoginRequest } from '@/types';
 
 export const Route = createFileRoute('/login')({
     beforeLoad: () => {
@@ -27,13 +27,14 @@ export const Route = createFileRoute('/login')({
     component: LoginPage,
 });
 
+const DEFAULT_FULL_LOGO_URL = '/cryptlex-logo.svg';
+
 function LoginPage() {
     const navigate = useNavigate();
     const { branding } = Route.useRouteContext();
 
     const login = useMutation({
-        mutationFn: (body: LoginRequest) =>
-            apiFetch<AccessTokenResponse>('/api/login', { method: 'POST', body: JSON.stringify(body) }),
+        mutationFn: async (body: ApiSchema<'LoginRequest'>) => (await client.POST('/api/login', { body })).data!,
         onSuccess: data => {
             setAccessToken(data.accessToken);
             navigate({ to: '/' });
@@ -45,9 +46,19 @@ function LoginPage() {
         onSubmit: ({ value }) => login.mutate(value),
     });
 
+    const logo = (
+        <img
+            src={branding.logoUrl ?? DEFAULT_FULL_LOGO_URL}
+            alt={branding.appName ?? ''}
+            className="m-0 h-12 dark:brightness-1500"
+        />
+    );
+
     return (
-        <main className="flex min-h-screen w-full items-center justify-center px-4">
+        <main className="flex min-h-screen w-full flex-col items-center justify-center px-4">
+            <div className="flex justify-center pb-input md:hidden">{logo}</div>
             <Card className="w-full md:max-w-md">
+                <div className="hidden justify-center pb-input md:flex">{logo}</div>
                 <CardHeader>
                     <CardTitle>{m['authPage.login.title']()}</CardTitle>
                     <CardDescription>
