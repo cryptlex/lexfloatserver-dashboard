@@ -20,7 +20,11 @@ const INCLUDE = [
 export const productsQuery = queryOptions({
     queryKey: ['get', '/api/v4/products'],
     queryFn: async () =>
-        (await client.GET('/api/v4/products', { params: { query: { limit: 100, include: [...INCLUDE] } } }))?.data,
+        (
+            await client.GET('/api/v4/products', {
+                params: { query: { limit: 100, include: [...INCLUDE] } },
+            })
+        )?.data,
 });
 
 export const productQuery = (productId: string) =>

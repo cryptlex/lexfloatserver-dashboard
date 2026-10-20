@@ -124,7 +124,7 @@ function DevicesPage() {
         columnsToHideByDefault: { clientVersion: true },
         filterConfig,
         initialFilters: [],
-        previewFilters: ['offline'],
+        previewFilters: hasManyProducts ? ['productId', 'offline'] : ['offline'],
         tableActions: [
             {
                 resourceType: 'single',

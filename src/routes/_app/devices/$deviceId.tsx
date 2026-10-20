@@ -9,7 +9,6 @@ import { productsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
 import { date } from '../products/-product';
 
-// The detail route always includes the lease's metadata and meter attributes.
 const deviceQuery = (id: string) =>
     queryOptions({
         queryKey: ['get', '/api/v4/floating-licenses/{id}', id],
@@ -18,7 +17,6 @@ const deviceQuery = (id: string) =>
 
 export const Route = createFileRoute('/_app/devices/$deviceId')({
     beforeLoad: async ({ context, params }) => {
-        // A lease disappears once the device releases it or it expires, so a stale link is a 404.
         const device = await context.queryClient
             .query({ ...deviceQuery(params.deviceId), staleTime: 'static' })
             .catch(error => {

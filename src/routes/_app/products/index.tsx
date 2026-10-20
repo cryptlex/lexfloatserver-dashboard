@@ -1,15 +1,9 @@
-import { Button } from '@cryptlex/web-components/components/button';
-import { IcEye } from '@cryptlex/web-components/components/icons';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, createLink } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { routerBreadcrumbs } from '@/components/breadcrumbs';
-import { InfoGrid, InfoItem } from '@/components/info-panel';
 import { productsQuery, serverStatsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
-import { ActivateDialog } from './-activate-dialog';
-import { date, ProductDetails, ProductHeader, seats } from './-product';
-
-const ButtonLink = createLink(Button);
+import { ProductCard, ProductDetails } from './-product';
 
 export const Route = createFileRoute('/_app/products/')({
     beforeLoad: () => routerBreadcrumbs([{ to: '/products', label: m['productsPage.pageTitle']() }]),
@@ -58,36 +52,8 @@ function ProductsPage() {
             </dl>
             <ul className="grid grid-cols-1 gap-icon sm:grid-cols-2">
                 {products?.map(product => (
-                    <li key={product.id}>
-                        <article className="flex h-full flex-col gap-3 rounded-lg border bg-surface-primary p-4">
-                            <ProductHeader product={product} />
-                            {product.status !== 'not_activated' && product.enabled && (
-                                <InfoGrid>
-                                    <InfoItem
-                                        label={m['allowedFloatingClients.label']()}
-                                        hint={m['allowedFloatingClients.hint']()}
-                                        value={seats(product)}
-                                    />
-                                    <InfoItem
-                                        label={m['expiresAt.label']()}
-                                        hint={m['expiresAt.hint']()}
-                                        value={date(product.expiresAt)}
-                                    />
-                                </InfoGrid>
-                            )}
-                            {product.status === 'not_activated' && (
-                                <p className="text-sm text-text-secondary">{m['productsPage.activateHint']()}</p>
-                            )}
-                            <footer className="mt-auto flex justify-end gap-icon">
-                                {product.status === 'not_activated' && <ActivateDialog product={product} />}
-                                {product.status !== 'not_activated' && (
-                                    <ButtonLink to="/products/$productId" params={{ productId: product.id }}>
-                                        <IcEye />
-                                        {m['common.action.view']()}
-                                    </ButtonLink>
-                                )}
-                            </footer>
-                        </article>
+                    <li key={product.id} className="grid">
+                        <ProductCard product={product} />
                     </li>
                 ))}
             </ul>

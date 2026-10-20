@@ -1,10 +1,11 @@
 import { Badge } from '@cryptlex/web-components/components/badge';
 import { Button } from '@cryptlex/web-components/components/button';
 import { CopyButton } from '@cryptlex/web-components/components/copy-button';
+import { IcEye } from '@cryptlex/web-components/components/icons';
 import { ProgressBar } from '@cryptlex/web-components/components/progress-bar';
 import { formatDate } from '@cryptlex/web-components/utilities/date';
 import type { ApiSchema } from '@cryptlex/web-components/utilities/resources';
-import { useRouteContext } from '@tanstack/react-router';
+import { createLink, useRouteContext } from '@tanstack/react-router';
 import type React from 'react';
 import { CardAvatar } from '@/components/card-avatar';
 import { InfoGrid, InfoItem, InfoPanel, InfoTable } from '@/components/info-panel';
@@ -13,6 +14,8 @@ import { ActivateDialog } from './-activate-dialog';
 import { DeactivateDialog } from './-deactivate-dialog';
 
 type Product = ApiSchema<'Product'>;
+
+const ButtonLink = createLink(Button);
 
 export const STATUS: Record<
     Product['status'],
@@ -99,10 +102,48 @@ export function ProductHeader({
     );
 }
 
+/** Compact product summary; also stands in for the details page while the product is not activated. */
+export function ProductCard({ product }: { product: Product }) {
+    const isActivated = product.status !== 'not_activated';
+    return (
+        <article className="flex flex-col gap-3 rounded-lg border bg-surface-primary p-4">
+            <ProductHeader product={product} />
+            {isActivated && product.enabled && (
+                <InfoGrid>
+                    <InfoItem
+                        label={m['allowedFloatingClients.label']()}
+                        hint={m['allowedFloatingClients.hint']()}
+                        value={seats(product)}
+                    />
+                    <InfoItem
+                        label={m['expiresAt.label']()}
+                        hint={m['expiresAt.hint']()}
+                        value={date(product.expiresAt)}
+                    />
+                </InfoGrid>
+            )}
+            {!isActivated && <p className="text-sm text-text-secondary">{m['productsPage.activateHint']()}</p>}
+            <footer className="mt-auto flex justify-end gap-icon">
+                {isActivated ? (
+                    <ButtonLink to="/products/$productId" params={{ productId: product.id }}>
+                        <IcEye />
+                        {m['common.action.view']()}
+                    </ButtonLink>
+                ) : (
+                    <ActivateDialog product={product} />
+                )}
+            </footer>
+        </article>
+    );
+}
+
 export function ProductDetails({ product }: { product: Product }) {
     const { license } = product;
     const isActivated = license && license.status !== 'not_activated';
     const appName = useRouteContext({ from: '__root__' }).branding.appName ?? '';
+
+    // Nothing to show before activation, so offer just the activate prompt.
+    if (product.status === 'not_activated') return <ProductCard product={product} />;
 
     return (
         <article className="flex flex-col gap-icon">
@@ -122,9 +163,7 @@ export function ProductDetails({ product }: { product: Product }) {
                                 <DeactivateDialog product={product} licenseKey={license.key} />
                             )}
                         </>
-                    ) : (
-                        product.status === 'not_activated' && <ActivateDialog product={product} />
-                    )
+                    ) : null
                 }
             />
 
