@@ -3,43 +3,16 @@ import { Button } from '@cryptlex/web-components/components/button';
 import { CopyButton } from '@cryptlex/web-components/components/copy-button';
 import { ProgressBar } from '@cryptlex/web-components/components/progress-bar';
 import { formatDate } from '@cryptlex/web-components/utilities/date';
-import type { ApiQuery, ApiSchema } from '@cryptlex/web-components/utilities/resources';
-import { queryOptions } from '@tanstack/react-query';
+import type { ApiSchema } from '@cryptlex/web-components/utilities/resources';
 import { useRouteContext } from '@tanstack/react-router';
 import type React from 'react';
 import { CardAvatar } from '@/components/card-avatar';
 import { InfoGrid, InfoItem, InfoPanel, InfoTable } from '@/components/info-panel';
-import { client } from '@/lib/api';
 import { m } from '@/paraglide/messages.js';
 import { ActivateDialog } from './-activate-dialog';
 import { DeactivateDialog } from './-deactivate-dialog';
 
 type Product = ApiSchema<'Product'>;
-
-// Every sub-resource, so one call is enough to render a product's full details.
-const INCLUDE = [
-    'license.meterAttributes',
-    'license.featureEntitlements',
-    'license.metadata',
-    'metadata',
-] as const satisfies ApiQuery<'listProducts'>['include'];
-
-export const productsQuery = queryOptions({
-    queryKey: ['get', '/api/v4/products'],
-    queryFn: async () =>
-        (await client.GET('/api/v4/products', { params: { query: { limit: 100, include: [...INCLUDE] } } }))?.data,
-});
-
-export const productQuery = (productId: string) =>
-    queryOptions({
-        queryKey: ['get', '/api/v4/products', productId],
-        queryFn: async () => {
-            const { data } = await client.GET('/api/v4/products', {
-                params: { query: { id: productId, include: [...INCLUDE] } },
-            });
-            return data?.[0] ?? null;
-        },
-    });
 
 export const STATUS: Record<
     Product['status'],
@@ -229,7 +202,6 @@ export function ProductDetails({ product }: { product: Product }) {
                                             : m['common.state.online']()
                                     }
                                 />
-                                <InfoItem label={m['createdAt.label']()} value={date(license.createdAt)} />
                                 <InfoItem label={m['activatedAt.label']()} value={date(license.activatedAt)} />
                                 {license.user && (
                                     <InfoItem

@@ -4,10 +4,10 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, createLink } from '@tanstack/react-router';
 import { routerBreadcrumbs } from '@/components/breadcrumbs';
 import { InfoGrid, InfoItem } from '@/components/info-panel';
-import { serverStatsQuery } from '@/lib/queries';
+import { productsQuery, serverStatsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
 import { ActivateDialog } from './-activate-dialog';
-import { date, ProductDetails, ProductHeader, productsQuery, seats } from './-product';
+import { date, ProductDetails, ProductHeader, seats } from './-product';
 
 const ButtonLink = createLink(Button);
 

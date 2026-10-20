@@ -1,8 +1,9 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { routerBreadcrumbs } from '@/components/breadcrumbs';
+import { productQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
-import { ProductDetails, productQuery } from './-product';
+import { ProductDetails } from './-product';
 
 export const Route = createFileRoute('/_app/products/$productId')({
     beforeLoad: async ({ context, params }) => {

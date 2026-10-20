@@ -100,9 +100,6 @@
             "hint": "Activated without internet using a response file. This server doesn't sync, so changes to the license don't reach it until it's activated again."
         }
     },
-    "createdAt": {
-        "label": "Created"
-    },
     "activatedAt": {
         "label": "Activated"
     },

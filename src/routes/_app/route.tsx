@@ -19,6 +19,7 @@ import {
 import { createFileRoute, createLink, Outlet, redirect, useNavigate } from '@tanstack/react-router';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { isLoggedIn, removeAccessToken } from '@/lib/api';
+import { productsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
 
 const SidebarLink = createLink(SidebarMenuButton);
@@ -30,6 +31,8 @@ export const Route = createFileRoute('/_app')({
     beforeLoad: () => {
         if (!isLoggedIn()) throw redirect({ to: '/login' });
     },
+    // Products and devices both need the product list, so load it once here; pages read it from the cache.
+    loader: ({ context }) => context.queryClient.query({ ...productsQuery, staleTime: 'static' }),
     component: AppLayout,
 });
 

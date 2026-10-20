@@ -5,6 +5,7 @@ import { routerBreadcrumbs } from '@/components/breadcrumbs';
 import { CardAvatar } from '@/components/card-avatar';
 import { InfoGrid, InfoItem, InfoPanel, InfoTable } from '@/components/info-panel';
 import { ApiError, client } from '@/lib/api';
+import { productsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
 import { date } from '../products/-product';
 
@@ -49,6 +50,9 @@ export const Route = createFileRoute('/_app/devices/$deviceId')({
 function DevicePage() {
     const { deviceId } = Route.useParams();
     const { data: device } = useSuspenseQuery(deviceQuery(deviceId));
+    const { data: products } = useSuspenseQuery(productsQuery);
+    // With a single product, naming it on every device is noise.
+    const hasManyProducts = (products?.length ?? 0) > 1;
     // beforeLoad already threw notFound() for a missing device.
     if (!device) return null;
 
@@ -58,7 +62,7 @@ function DevicePage() {
                 <CardAvatar name={device.hostname} />
                 <div className="flex min-w-0 flex-col items-start gap-1">
                     <h1 className="wrap-anywhere font-semibold text-foreground">{device.hostname}</h1>
-                    <p className="text-sm text-text-secondary">{device.productDisplayName}</p>
+                    {hasManyProducts && <p className="text-sm text-text-secondary">{device.productDisplayName}</p>}
                 </div>
             </header>
 
@@ -89,18 +93,20 @@ function DevicePage() {
 
                 <InfoPanel title={m['devicesPage.details.sections.lease.title']()}>
                     <InfoGrid>
-                        <InfoItem
-                            label={m['devicesPage.columns.product']()}
-                            value={
-                                <Link
-                                    to="/products/$productId"
-                                    params={{ productId: device.productId }}
-                                    className="link"
-                                >
-                                    {device.productDisplayName}
-                                </Link>
-                            }
-                        />
+                        {hasManyProducts && (
+                            <InfoItem
+                                label={m['devicesPage.columns.product']()}
+                                value={
+                                    <Link
+                                        to="/products/$productId"
+                                        params={{ productId: device.productId }}
+                                        className="link"
+                                    >
+                                        {device.productDisplayName}
+                                    </Link>
+                                }
+                            />
+                        )}
                         <InfoItem label={m['devicesPage.columns.firstSeenAt']()} value={date(device.createdAt)} />
                         <InfoItem
                             label={m['devicesPage.columns.lastSeenAt']()}

@@ -7,8 +7,9 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { createColumnHelper } from '@tanstack/react-table';
 import { routerBreadcrumbs } from '@/components/breadcrumbs';
+import { productsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
-import { date, productsQuery } from '../products/-product';
+import { date } from '../products/-product';
 
 export const Route = createFileRoute('/_app/devices/')({
     beforeLoad: () => routerBreadcrumbs([{ to: '/devices', label: m['devicesPage.pageTitle']() }]),
@@ -55,6 +56,8 @@ const columnHelper = createColumnHelper<ApiSchema<'FloatingLicense'>>();
 function DevicesPage() {
     const { data: products } = useSuspenseQuery(productsQuery);
     const navigate = useNavigate();
+    // With a single product, the product column and filter say nothing.
+    const hasManyProducts = (products?.length ?? 0) > 1;
 
     const columns = [
         columnHelper.accessor('hostname', {
@@ -66,10 +69,14 @@ function DevicesPage() {
                 </div>
             ),
         }),
-        columnHelper.accessor('productDisplayName', {
-            header: m['devicesPage.columns.product'](),
-            enableSorting: false,
-        }),
+        ...(hasManyProducts
+            ? [
+                  columnHelper.accessor('productDisplayName', {
+                      header: m['devicesPage.columns.product'](),
+                      enableSorting: false,
+                  }),
+              ]
+            : []),
         columnHelper.accessor('ip', {
             header: m['devicesPage.columns.ipAddress'](),
             cell: ({ getValue }) => <span className="font-mono">{getValue()}</span>,
@@ -102,10 +109,12 @@ function DevicesPage() {
     // ISO strings, and the API only takes unix seconds.
     // FiltersConfig wants every filterable query param (even `include`); only these two are filters here.
     const filterConfig = {
-        productId: {
-            type: 'enum',
-            options: products?.map(product => ({ id: product.id, label: product.displayName })) ?? [],
-        },
+        ...(hasManyProducts && {
+            productId: {
+                type: 'enum',
+                options: products?.map(product => ({ id: product.id, label: product.displayName })) ?? [],
+            },
+        }),
         offline: { type: 'bool' },
     } satisfies Partial<FiltersConfig<'listFloatingLicenses'>> as FiltersConfig<'listFloatingLicenses'>;
 
@@ -115,7 +124,7 @@ function DevicesPage() {
         columnsToHideByDefault: { clientVersion: true },
         filterConfig,
         initialFilters: [],
-        previewFilters: (products?.length ?? 0) > 1 ? ['productId', 'offline'] : ['offline'],
+        previewFilters: ['offline'],
         tableActions: [
             {
                 resourceType: 'single',
