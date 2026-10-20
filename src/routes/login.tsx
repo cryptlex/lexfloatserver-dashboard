@@ -34,8 +34,9 @@ function LoginPage() {
     const { branding } = Route.useRouteContext();
 
     const login = useMutation({
-        mutationFn: async (body: ApiSchema<'LoginRequest'>) => (await client.POST('/api/login', { body })).data!,
+        mutationFn: async (body: ApiSchema<'LoginRequest'>) => (await client.POST('/api/login', { body }))?.data,
         onSuccess: data => {
+            if (!data) return;
             setAccessToken(data.accessToken);
             navigate({ to: '/' });
         },

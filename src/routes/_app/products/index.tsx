@@ -2,6 +2,7 @@ import { Button } from '@cryptlex/web-components/components/button';
 import { IcEye } from '@cryptlex/web-components/components/icons';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, createLink } from '@tanstack/react-router';
+import { routerBreadcrumbs } from '@/components/breadcrumbs';
 import { InfoGrid, InfoItem } from '@/components/info-panel';
 import { serverStatsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
@@ -11,8 +12,7 @@ import { date, ProductDetails, ProductHeader, productsQuery, seats } from './-pr
 const ButtonLink = createLink(Button);
 
 export const Route = createFileRoute('/_app/products/')({
-    loader: ({ context }) =>
-        Promise.all([context.queryClient.query(productsQuery), context.queryClient.query(serverStatsQuery)]),
+    beforeLoad: () => routerBreadcrumbs([{ to: '/products', label: m['productsPage.pageTitle']() }]),
     head: ({ match }) => ({
         meta: [
             {

@@ -17,6 +17,7 @@ import {
     SidebarTrigger,
 } from '@cryptlex/web-components/components/sidebar';
 import { createFileRoute, createLink, Outlet, redirect, useNavigate } from '@tanstack/react-router';
+import { Breadcrumbs } from '@/components/breadcrumbs';
 import { isLoggedIn, removeAccessToken } from '@/lib/api';
 import { m } from '@/paraglide/messages.js';
 
@@ -86,6 +87,7 @@ function AppLayout() {
             <SidebarOutlet className="h-screen bg-background">
                 <SidebarOutletHeader>
                     <SidebarTrigger size="icon-sm" className="lg:hidden" />
+                    <Breadcrumbs />
                 </SidebarOutletHeader>
                 <SidebarOutletContent className="p-icon">
                     <Outlet />

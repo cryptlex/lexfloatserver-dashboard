@@ -28,3 +28,7 @@ src/paraglide
 *.tsbuildinfo
 .env
 .pnpm-store/
+
+SERVER_2.md
+swagger.json
+SERVER.md

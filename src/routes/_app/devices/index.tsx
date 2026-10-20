@@ -6,11 +6,12 @@ import type { ApiSchema } from '@cryptlex/web-components/utilities/resources';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { createColumnHelper } from '@tanstack/react-table';
+import { routerBreadcrumbs } from '@/components/breadcrumbs';
 import { m } from '@/paraglide/messages.js';
 import { date, productsQuery } from '../products/-product';
 
 export const Route = createFileRoute('/_app/devices/')({
-    loader: ({ context }) => context.queryClient.query(productsQuery),
+    beforeLoad: () => routerBreadcrumbs([{ to: '/devices', label: m['devicesPage.pageTitle']() }]),
     head: ({ match }) => ({
         meta: [
             {

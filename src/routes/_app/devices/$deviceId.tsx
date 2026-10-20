@@ -1,6 +1,7 @@
 import { Badge } from '@cryptlex/web-components/components/badge';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
+import { routerBreadcrumbs } from '@/components/breadcrumbs';
 import { CardAvatar } from '@/components/card-avatar';
 import { InfoGrid, InfoItem, InfoPanel, InfoTable } from '@/components/info-panel';
 import { ApiError, client } from '@/lib/api';
@@ -15,20 +16,28 @@ const deviceQuery = (id: string) =>
     });
 
 export const Route = createFileRoute('/_app/devices/$deviceId')({
-    loader: async ({ context, params }) => {
+    beforeLoad: async ({ context, params }) => {
         // A lease disappears once the device releases it or it expires, so a stale link is a 404.
-        const device = await context.queryClient.query(deviceQuery(params.deviceId)).catch(error => {
-            if (error instanceof ApiError && error.status === 404) throw notFound();
-            throw error;
-        });
+        const device = await context.queryClient
+            .query({ ...deviceQuery(params.deviceId), staleTime: 'static' })
+            .catch(error => {
+                if (error instanceof ApiError && error.status === 404) throw notFound();
+                throw error;
+            });
         if (!device) throw notFound();
-        return device;
+        return {
+            device,
+            ...routerBreadcrumbs([
+                { to: '/devices', label: m['devicesPage.pageTitle']() },
+                { to: '.', label: device.hostname },
+            ]),
+        };
     },
-    head: ({ match, loaderData }) => ({
+    head: ({ match }) => ({
         meta: [
             {
                 title: m['common.pageTitle']({
-                    title: loaderData?.hostname ?? '',
+                    title: match.context.device.hostname,
                     appName: match.context.branding.appName ?? '',
                 }),
             },
@@ -40,7 +49,7 @@ export const Route = createFileRoute('/_app/devices/$deviceId')({
 function DevicePage() {
     const { deviceId } = Route.useParams();
     const { data: device } = useSuspenseQuery(deviceQuery(deviceId));
-    // The loader already threw notFound() for a missing device.
+    // beforeLoad already threw notFound() for a missing device.
     if (!device) return null;
 
     return (

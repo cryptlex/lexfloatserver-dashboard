@@ -1,6 +1,7 @@
 import { Badge } from '@cryptlex/web-components/components/badge';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { routerBreadcrumbs } from '@/components/breadcrumbs';
 import { InfoGrid, InfoItem, InfoPanel } from '@/components/info-panel';
 import { client } from '@/lib/api';
 import { serverStatsQuery } from '@/lib/queries';
@@ -8,12 +9,11 @@ import { m } from '@/paraglide/messages.js';
 
 const configQuery = queryOptions({
     queryKey: ['get', '/api/v4/server/config'],
-    queryFn: async () => (await client.GET('/api/v4/server/config')).data!,
+    queryFn: async () => (await client.GET('/api/v4/server/config'))?.data,
 });
 
 export const Route = createFileRoute('/_app/settings')({
-    loader: ({ context }) =>
-        Promise.all([context.queryClient.query(serverStatsQuery), context.queryClient.query(configQuery)]),
+    beforeLoad: () => routerBreadcrumbs([{ to: '/settings', label: m['settingsPage.pageTitle']() }]),
     head: ({ match }) => ({
         meta: [
             {
@@ -30,6 +30,7 @@ export const Route = createFileRoute('/_app/settings')({
 function SettingsPage() {
     const { data: stats } = useSuspenseQuery(serverStatsQuery);
     const { data: config } = useSuspenseQuery(configQuery);
+    if (!config) return null;
 
     // Lists can be long, so they take the full row, wrap, and scroll past a few lines.
     const list = (values: string[]) =>
@@ -50,16 +51,16 @@ function SettingsPage() {
             <InfoPanel title={m['settingsPage.sections.server.title']()}>
                 <InfoGrid>
                     <InfoItem label={m['version.label']()} value={stats?.version} mono />
-                    <InfoItem label={m['port.label']()} value={config.server.port} mono />
+                    <InfoItem label={m['port.label']()} value={config?.server.port} mono />
                     <InfoItem
                         label={m['cryptlexHost.label']()}
-                        value={config.server.cryptlexHost || m['common.state.default']()}
+                        value={config?.server.cryptlexHost || m['common.state.default']()}
                         mono
                     />
                     <InfoItem
                         label={m['leaseDuration.label']()}
                         hint={m['leaseDuration.hint']()}
-                        value={m['common.unit.seconds']({ count: config.productDefaults.leaseDuration })}
+                        value={m['common.unit.seconds']({ count: config?.productDefaults.leaseDuration })}
                     />
                     <InfoItem
                         label={m['allowedClockOffset.label']()}
