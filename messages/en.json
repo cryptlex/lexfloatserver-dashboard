@@ -71,7 +71,7 @@
                 "hint": "This license is valid and can be used on activated devices."
             },
             "notActivated": {
-                "label": "Not activated",
+                "label": "Not Activated",
                 "hint": "This server hasn't activated a license for this product yet, so it can't hand out seats."
             },
             "expired": {
@@ -83,7 +83,7 @@
                 "hint": "This license is temporarily paused. It starts working again on its own once the software vendor lifts the suspension."
             },
             "gracePeriodOver": {
-                "label": "Sync required",
+                "label": "Sync Required",
                 "hint": "This server couldn't sync with {appName} in time, so it stopped handing out seats until it syncs again."
             },
             "disabled": {
@@ -207,10 +207,10 @@
         "pageTitle": "Products",
         "action": {
             "activate": "Activate",
-            "activateLicense": "Activate license",
+            "activateLicense": "Activate License",
             "viewProduct": "View product",
-            "forceSync": "Force Sync",
-            "deactivate": "Deactivate"
+            "deactivate": "Deactivate",
+            "sync": "Sync"
         },
         "sections": {
             "licenseDetails": {
@@ -250,12 +250,27 @@
         "card": {
             "seats": "Seats"
         },
-        "disabled": {
-            "description": "Disabled in {file}, so this server does not serve it."
-        },
-        "notActivated": {
-            "title": "Activate a license for this product",
-            "description": "This product has no active server license. {appName} refuses every lease request for it until one is activated."
+        "banner": {
+            "notActivated": {
+                "title": "Activate a License for This Product",
+                "description": "No license is activated for this product yet. Until you activate one, devices can't get a seat from the license server."
+            },
+            "gracePeriodOver": {
+                "title": "The License Server Needs to Sync",
+                "description": "The license server hasn't synced over the internet for longer than this license allows, so devices can't get a seat. Connect it to the internet and select Sync."
+            },
+            "expired": {
+                "title": "This Product's License Has Expired",
+                "description": "The license for this product has expired, so devices can't get a seat from the license server. Ask your software vendor to renew the license. Then select Sync, or activate again if the server has no internet access."
+            },
+            "suspended": {
+                "title": "This Product's License Is Suspended",
+                "description": "The license for this product is suspended, so devices can't get a seat from the license server. Contact your software vendor."
+            },
+            "disabled": {
+                "title": "This Product Is Disabled",
+                "description": "The license server doesn't serve this product, so devices can't get a seat for it. To enable the product, edit {file} and restart the server."
+            }
         },
         "activateDialog": {
             "title": "Activate {product}",

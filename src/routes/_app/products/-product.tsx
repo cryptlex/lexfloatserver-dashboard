@@ -1,3 +1,4 @@
+import { Alert } from '@cryptlex/web-components/components/alert';
 import { Badge } from '@cryptlex/web-components/components/badge';
 import { Button } from '@cryptlex/web-components/components/button';
 import { CopyButton } from '@cryptlex/web-components/components/copy-button';
@@ -108,39 +109,113 @@ export function ProductHeader({
     );
 }
 
-/** Compact product summary; also stands in for the details page while the product is not activated or disabled. */
-export function ProductCard({ product }: { product: Product }) {
-    const isActivated = product.status !== 'not_activated';
-    const appName = useRouteContext({ from: '__root__' }).branding.appName ?? '';
+/** LexFloatServer has no sync endpoint yet, so this stays disabled until it does. */
+function SyncButton() {
+    return <Button isDisabled>{m['productsPage.action.sync']()}</Button>;
+}
 
-    if (!isActivated) {
+function Banner({
+    title,
+    children,
+    actions,
+    variant,
+}: {
+    title: string;
+    children: React.ReactNode;
+    actions?: React.ReactNode;
+    /** Shows the banner as an alert, for a product that is activated but can't hand out seats. */
+    variant?: 'destructive' | 'warning';
+}) {
+    if (variant) {
         return (
-            <article className="flex flex-col gap-4 rounded-lg border bg-surface-primary p-5">
-                <ProductHeader product={product} />
-                <div className="flex flex-col gap-1">
-                    <h3 className="font-semibold text-foreground">{m['productsPage.notActivated.title']()}</h3>
-                    <p className="text-sm text-text-secondary">
-                        {m['productsPage.notActivated.description']({ appName })}
-                    </p>
+            <Alert variant={variant} className="sm:w-full">
+                <div className="flex flex-wrap items-center gap-icon">
+                    <div className="flex min-w-0 flex-1 flex-col gap-1">
+                        <h3 className="font-semibold">{title}</h3>
+                        <p className="text-text-secondary">{children}</p>
+                    </div>
+                    {actions && <div className="flex gap-icon">{actions}</div>}
                 </div>
-                <footer className="mt-auto flex justify-end border-t pt-3">
-                    <ActivateDialog product={product} />
-                </footer>
-            </article>
+            </Alert>
         );
     }
+    return (
+        <>
+            <div className="flex flex-col gap-1">
+                <h3 className="font-semibold text-foreground">{title}</h3>
+                <p className="text-sm text-text-secondary">{children}</p>
+            </div>
+            {actions && <footer className="mt-auto flex justify-end gap-icon border-t pt-3">{actions}</footer>}
+        </>
+    );
+}
 
-    if (product.status === 'disabled') {
-        // Split around a placeholder so the file name can be set in mono inside the translated sentence.
-        const [before, after] = m['productsPage.disabled.description']({ file: '\0' }).split('\0');
-        return (
-            <article className="flex flex-col gap-4 rounded-lg border bg-surface-primary p-5">
-                <ProductHeader product={product} />
-                <p className="text-sm text-text-secondary">
+/** Why a product can't hand out seats, and the fix. No badge: the header badge already names the state. */
+function StatusBanner({ product }: { product: Product }) {
+    switch (product.status) {
+        case 'not_activated':
+            return (
+                <Banner
+                    title={m['productsPage.banner.notActivated.title']()}
+                    actions={<ActivateDialog product={product} />}
+                >
+                    {m['productsPage.banner.notActivated.description']()}
+                </Banner>
+            );
+        case 'grace_period_over':
+            return (
+                <Banner
+                    title={m['productsPage.banner.gracePeriodOver.title']()}
+                    actions={<SyncButton />}
+                    variant="destructive"
+                >
+                    {m['productsPage.banner.gracePeriodOver.description']()}
+                </Banner>
+            );
+        case 'expired':
+            return (
+                <Banner
+                    title={m['productsPage.banner.expired.title']()}
+                    variant="destructive"
+                    actions={
+                        <>
+                            <SyncButton />
+                            <ActivateDialog product={product} />
+                        </>
+                    }
+                >
+                    {m['productsPage.banner.expired.description']()}
+                </Banner>
+            );
+        case 'suspended':
+            return (
+                <Banner title={m['productsPage.banner.suspended.title']()} variant="warning">
+                    {m['productsPage.banner.suspended.description']()}
+                </Banner>
+            );
+        case 'disabled': {
+            // Split around a placeholder so the file name can be set in mono inside the translated sentence.
+            const [before, after] = m['productsPage.banner.disabled.description']({ file: '\0' }).split('\0');
+            return (
+                <Banner title={m['productsPage.banner.disabled.title']()}>
                     {before}
                     <code className="font-mono">config.yml</code>
                     {after}
-                </p>
+                </Banner>
+            );
+        }
+        case 'ok':
+            return null;
+    }
+}
+
+/** Compact product summary; also stands in for the details page while the product is not activated or disabled. */
+export function ProductCard({ product }: { product: Product }) {
+    if (product.status === 'not_activated' || product.status === 'disabled') {
+        return (
+            <article className="flex flex-col gap-4 rounded-lg border bg-surface-primary p-5">
+                <ProductHeader product={product} />
+                <StatusBanner product={product} />
             </article>
         );
     }
@@ -328,7 +403,7 @@ export function ProductDetails({ product }: { product: Product }) {
                 actions={
                     isActivated ? (
                         <>
-                            <Button>{m['productsPage.action.forceSync']()}</Button>
+                            <SyncButton />
                             {license.activationMode.current === 'offline' ? (
                                 // TODO: offline deactivation flow.
                                 <Button variant="destructive_neutral">{m['productsPage.action.deactivate']()}</Button>
@@ -339,6 +414,8 @@ export function ProductDetails({ product }: { product: Product }) {
                     ) : null
                 }
             />
+
+            <StatusBanner product={product} />
 
             <ProductStats product={product} />
 

@@ -1,14 +1,18 @@
-import { DataTable, DataTableProvider, useDataTableState } from '@cryptlex/web-components/components/data-table';
+import {
+    DataTable,
+    DataTableProvider,
+    getColumnHelper,
+    useDataTableState,
+} from '@cryptlex/web-components/components/data-table';
 import type { FilterConfig, FiltersConfig } from '@cryptlex/web-components/components/data-table-filter';
 import { IcEye } from '@cryptlex/web-components/components/icons';
-import type { ApiSchema } from '@cryptlex/web-components/utilities/resources';
+import type { ApiResponseBody } from '@cryptlex/web-components/utilities/resources';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { createColumnHelper } from '@tanstack/react-table';
 import { routerBreadcrumbs } from '@/components/breadcrumbs';
+import { ExpiryValue } from '@/components/expiry-value';
 import { productsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
-import { date } from '../products/-product';
 import { LeaseType } from './-device';
 
 export const Route = createFileRoute('/_app/devices/')({
@@ -26,32 +30,9 @@ export const Route = createFileRoute('/_app/devices/')({
     component: DevicesPage,
 });
 
-const relativeTimeFormat = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' });
-const relativeTimeUnits: [Intl.RelativeTimeFormatUnit, number][] = [
-    ['year', 31_536_000],
-    ['month', 2_592_000],
-    ['day', 86_400],
-    ['hour', 3_600],
-    ['minute', 60],
-    ['second', 1],
-];
-
-/** Epoch seconds as "in 5 minutes" over the exact date, laid out like web-portals-react's `ExpiryValue`. */
-function relativeDate(seconds: number) {
-    if (!seconds) return '';
-    const diff = seconds - Date.now() / 1000;
-    const [unit, size] = relativeTimeUnits.find(([, size]) => Math.abs(diff) >= size) ?? relativeTimeUnits[5];
-    return (
-        <span className="flex flex-col">
-            <time dateTime={new Date(seconds * 1000).toISOString()} className="text-primary font-semibold">
-                {relativeTimeFormat.format(Math.round(diff / size), unit)}
-            </time>
-            <span>{date(seconds)}</span>
-        </span>
-    );
-}
-
-const columnHelper = createColumnHelper<ApiSchema<'FloatingLicense'>>();
+const columnHelper = getColumnHelper<'listFloatingLicenses'>();
+type Device = ApiResponseBody<'listFloatingLicenses'>;
+type DeviceFilters = FiltersConfig<'listFloatingLicenses'> & { leaseType: FilterConfig };
 
 function DevicesPage() {
     const { data: products } = useSuspenseQuery(productsQuery);
@@ -86,13 +67,14 @@ function DevicesPage() {
             cell: ({ getValue }) => <LeaseType offline={getValue()} />,
         }),
         // Timestamps are epoch seconds, so they can't use `displayType: 'date'`, which expects ISO strings.
+        // A past renewal reads as a plain date; an expiry inside the next week reads relatively.
         columnHelper.accessor('updatedAt', {
             header: m['devicesPage.columns.leaseRenewedAt'](),
-            cell: ({ getValue }) => relativeDate(getValue()),
+            cell: ({ getValue }) => <ExpiryValue expiresAt={getValue()} />,
         }),
         columnHelper.accessor('expiresAt', {
             header: m['devicesPage.columns.leaseExpiresAt'](),
-            cell: ({ getValue }) => relativeDate(getValue()),
+            cell: ({ getValue }) => <ExpiryValue expiresAt={getValue()} />,
         }),
     ];
 
@@ -115,9 +97,9 @@ function DevicesPage() {
             ],
             toApiQuery: value => ({ offline: value === 'offline' }),
         },
-    } satisfies Record<string, FilterConfig> as unknown as FiltersConfig<'listFloatingLicenses'>;
+    } satisfies Record<string, FilterConfig> as unknown as DeviceFilters;
 
-    const state = useDataTableState<ApiSchema<'FloatingLicense'>, 'listFloatingLicenses'>({
+    const state = useDataTableState<Device, 'listFloatingLicenses', DeviceFilters>({
         path: '/api/v4/floating-licenses',
         columns,
         filterConfig,
@@ -137,7 +119,11 @@ function DevicesPage() {
     });
 
     return (
-        <DataTableProvider<ApiSchema<'FloatingLicense'>, 'listFloatingLicenses'> {...state}>
+        // DataTableProvider has no TFilterConfig generic, so it can't see the virtual `leaseType` key.
+        <DataTableProvider<Device, 'listFloatingLicenses'>
+            {...state}
+            previewFilters={state.previewFilters as (keyof FiltersConfig<'listFloatingLicenses'>)[]}
+        >
             <DataTable />
         </DataTableProvider>
     );
