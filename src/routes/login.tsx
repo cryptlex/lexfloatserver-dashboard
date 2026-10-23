@@ -7,7 +7,7 @@ import type { ApiSchema } from '@cryptlex/web-components/utilities/resources';
 import { V_STRING_REQUIRED } from '@cryptlex/web-components/utilities/validators';
 import { useMutation } from '@tanstack/react-query';
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
-import { client, isLoggedIn, setAccessToken } from '@/lib/api';
+import { ApiError, client, isLoggedIn, setAccessToken } from '@/lib/api';
 import { m } from '@/paraglide/messages.js';
 
 export const Route = createFileRoute('/login')({
@@ -27,7 +27,7 @@ export const Route = createFileRoute('/login')({
     component: LoginPage,
 });
 
-const DEFAULT_FULL_LOGO_URL = '/cryptlex-logo.svg';
+const DEFAULT_LOGO_URL = '/cryptlex-icon-logo.svg';
 
 function LoginPage() {
     const navigate = useNavigate();
@@ -47,24 +47,28 @@ function LoginPage() {
         onSubmit: ({ value }) => login.mutate(value),
     });
 
-    const logo = (
-        <img
-            src={branding.logoUrl ?? DEFAULT_FULL_LOGO_URL}
-            alt={branding.appName ?? ''}
-            className="m-0 h-12 dark:brightness-1500"
-        />
+    // Same icon and name as the sidebar header.
+    const brand = (
+        <div className="flex items-center gap-2 font-semibold text-lg">
+            <img src={branding.logoUrl ?? DEFAULT_LOGO_URL} alt="" className="size-8" />
+            {branding.appName}
+        </div>
     );
+
+    // The API answers a wrong username or password with a 400; don't say which of the two is wrong.
+    const loginError =
+        login.error instanceof ApiError && login.error.status === 400
+            ? m['authPage.login.error.invalidCredentials']()
+            : login.error?.message;
 
     return (
         <main className="flex min-h-screen w-full flex-col items-center justify-center px-4">
-            <div className="flex justify-center pb-input md:hidden">{logo}</div>
+            <div className="flex justify-center pb-input md:hidden">{brand}</div>
             <Card className="w-full md:max-w-md">
-                <div className="hidden justify-center pb-input md:flex">{logo}</div>
+                <div className="hidden justify-center pb-input md:flex">{brand}</div>
                 <CardHeader>
                     <CardTitle>{m['authPage.login.title']()}</CardTitle>
-                    <CardDescription>
-                        {m['authPage.login.description']({ appName: branding.appName ?? '' })}
-                    </CardDescription>
+                    <CardDescription>{m['authPage.login.description']()}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <Form onSubmit={() => form.handleSubmit()} className="flex flex-col gap-icon">
@@ -89,7 +93,7 @@ function LoginPage() {
                             )}
                         </form.AppField>
 
-                        {login.error && <Alert variant="destructive">{login.error.message}</Alert>}
+                        {loginError && <Alert variant="destructive">{loginError}</Alert>}
 
                         <Button type="submit" variant="primary" isPending={login.isPending}>
                             {m['authPage.login.action.submit']()}

@@ -5,6 +5,7 @@ import { setThemeHue } from '@cryptlex/web-components/utilities/theme';
 import { type QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRootRouteWithContext, HeadContent, Outlet, useRouteContext } from '@tanstack/react-router';
 import { client } from '@/lib/api';
+import { m } from '@/paraglide/messages.js';
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
     beforeLoad: async ({ context }) => {
@@ -16,7 +17,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         });
         if (branding.faviconUrl) document.getElementById('favicon')?.setAttribute('href', branding.faviconUrl);
         if (typeof branding.hue === 'number') setThemeHue(branding.hue);
-        return { branding };
+        // Unbranded servers show a generic name rather than ours.
+        return { branding: { ...branding, appName: branding.appName || m['common.defaultAppName']() } };
     },
     head: ({ match }) => ({
         meta: [{ title: match.context.branding.appName }],
