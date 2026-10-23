@@ -123,7 +123,7 @@ export function InfoTable<TRow>({
 const HOVER_QUERY = '(hover: hover) and (pointer: fine)';
 
 /** An info icon: a tooltip where the device can hover, a tap-to-open popover where it can't. */
-function InfoHint({ hint }: { hint: string }) {
+export function InfoHint({ hint }: { hint: string }) {
     const canHover = useSyncExternalStore(
         onChange => {
             const mql = window.matchMedia(HOVER_QUERY);

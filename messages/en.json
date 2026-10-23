@@ -9,7 +9,10 @@
             "default": "Default",
             "unlimited": "Unlimited",
             "online": "Online",
-            "offline": "Offline"
+            "offline": "Offline",
+            "never": "Never",
+            "yes": "Yes",
+            "no": "No"
         },
         "unit": {
             "seconds": "{count} seconds",
@@ -31,6 +34,16 @@
             "hours": "In {count} hours",
             "day": "In 1 day",
             "days": "In {count} days"
+        },
+        "duration": {
+            "second": "1 second",
+            "seconds": "{count} seconds",
+            "minute": "1 minute",
+            "minutes": "{count} minutes",
+            "hour": "1 hour",
+            "hours": "{count} hours",
+            "day": "1 day",
+            "days": "{count} days"
         }
     },
     "nav": {
@@ -69,7 +82,7 @@
                 "hint": "This license is temporarily paused. It starts working again on its own once the software vendor lifts the suspension."
             },
             "gracePeriodOver": {
-                "label": "Grace period over",
+                "label": "Sync required",
                 "hint": "This server couldn't sync with {appName} in time, so it stopped handing out seats until it syncs again."
             },
             "disabled": {
@@ -85,43 +98,24 @@
         "label": "Concurrent Seats",
         "hint": "Devices holding a seat right now, out of the maximum allowed at the same time. A device frees its seat when the app closes or its lease runs out."
     },
-    "totalOfflineFloatingClients": {
-        "label": "Offline Devices",
-        "hint": "Devices holding a seat through an offline lease, so they don't need to reach this server until the lease ends."
-    },
     "expiresAt": {
         "label": "Expires",
-        "hint": "The license stops working after this date. Renewing the subscription moves the date forward."
-    },
-    "serverSyncGracePeriodExpiresAt": {
-        "label": "Sync Grace Period Ends",
-        "hint": "If this server can't reach {appName} to sync the license, it keeps handing out seats until this time."
+        "hint": "After this, devices can't get a seat."
     },
     "leasingStrategy": {
         "label": "Leasing Strategy",
-        "hint": "How seats are counted: per machine gives each device one seat, per instance gives each running copy of the app its own seat."
-    },
-    "activationMode": {
-        "label": "Activation Method",
-        "online": {
-            "hint": "Activated over the internet. Changes to the license reach this server automatically when it syncs."
+        "hint": "How seats are counted: per machine gives each device one seat, per instance gives each running copy of the app its own seat.",
+        "perMachine": {
+            "hint": "One seat per machine, for all app instances on it."
         },
-        "offline": {
-            "hint": "Activated without internet using a response file. This server doesn't sync, so changes to the license don't reach it until it's activated again."
+        "perInstance": {
+            "hint": "One seat per running app instance, even on the same machine."
         }
     },
     "activatedAt": {
         "label": "Activated"
     },
-    "user": {
-        "label": "User"
-    },
-    "organization": {
-        "label": "Organization"
-    },
     "featureEntitlements": {
-        "label": "Features",
-        "hint": "Features this license unlocks, with the value or expiry date that applies to each, if any.",
         "featureName": {
             "label": "Feature"
         },
@@ -222,8 +216,8 @@
             "deactivate": "Deactivate"
         },
         "sections": {
-            "overview": {
-                "title": "Overview"
+            "licenseDetails": {
+                "title": "License details"
             },
             "stats": {
                 "products": {
@@ -234,11 +228,30 @@
                 },
                 "offlineDevices": {
                     "label": "Offline devices"
+                },
+                "leaseDuration": {
+                    "hint": "How long a device keeps a seat between renewals."
                 }
+            },
+            "meterAttributes": {
+                "title": "Meter attributes",
+                "hint": "Usage limits on this license and current usage."
+            },
+            "featureEntitlements": {
+                "title": "Feature entitlements",
+                "hint": "Features this license unlocks."
+            },
+            "licenseMetadata": {
+                "title": "License metadata",
+                "hint": "Extra details added to this license."
+            },
+            "productMetadata": {
+                "title": "Product metadata",
+                "hint": "Extra details added to this product."
             }
         },
         "card": {
-            "seatsUsed": "Seats used"
+            "seats": "Seats"
         },
         "disabled": {
             "description": "Disabled in {file}, so this server does not serve it."
@@ -321,6 +334,26 @@
             "logging": {
                 "title": "Logging"
             }
+        }
+    },
+    "offline": {
+        "label": "Offline",
+        "hint": "Yes: activated offline and not synced since."
+    },
+    "offlineSeats": {
+        "label": "Offline seats",
+        "hint": "Seats that can be borrowed at once."
+    },
+    "maxOfflineLeaseDuration": {
+        "label": "Max offline lease duration",
+        "hint": "How long a seat can be borrowed."
+    },
+    "metadata": {
+        "key": {
+            "label": "Key"
+        },
+        "value": {
+            "label": "Value"
         }
     }
 }

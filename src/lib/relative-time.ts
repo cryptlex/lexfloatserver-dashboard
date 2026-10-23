@@ -95,3 +95,22 @@ function relativePhrase(ms: number): string {
     const minutes = Math.max(1, Math.round(ms / MINUTE_MS));
     return minutes === 1 ? m['time.in.minute']() : m['time.in.minutes']({ count: minutes });
 }
+
+/**
+ * A configured length of time, in the largest unit that divides it evenly:
+ * 3600 is "1 hour" but 5400 is "90 minutes", so the figure is never rounded.
+ */
+export function formatDuration(seconds: number): string {
+    const units = [
+        [DAY_MS / 1000, m['time.duration.day'], m['time.duration.days']],
+        [HOUR_MS / 1000, m['time.duration.hour'], m['time.duration.hours']],
+        [MINUTE_MS / 1000, m['time.duration.minute'], m['time.duration.minutes']],
+    ] as const;
+    for (const [size, one, many] of units) {
+        if (seconds >= size && seconds % size === 0) {
+            const count = seconds / size;
+            return count === 1 ? one() : many({ count });
+        }
+    }
+    return seconds === 1 ? m['time.duration.second']() : m['time.duration.seconds']({ count: seconds });
+}

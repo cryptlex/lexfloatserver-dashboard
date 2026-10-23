@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { routerBreadcrumbs } from '@/components/breadcrumbs';
+import { StatTiles } from '@/components/stat-tiles';
 import { productsQuery, serverStatsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
 import { ProductCard, ProductDetails } from './-product';
@@ -34,18 +35,7 @@ function ProductsPage() {
 
     return (
         <div className="flex flex-col gap-icon">
-            <dl className="grid grid-cols-1 gap-icon sm:grid-cols-3">
-                {tiles.map(tile => (
-                    <div key={tile.label} className="flex flex-col gap-2 rounded-lg border bg-surface-primary p-5">
-                        <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-                            {tile.label}
-                        </dt>
-                        <dd className="text-[1.375rem] font-semibold tracking-[-0.02em] text-foreground">
-                            {tile.value}
-                        </dd>
-                    </div>
-                ))}
-            </dl>
+            <StatTiles tiles={tiles} />
             <ul className="grid grid-cols-1 gap-icon sm:grid-cols-2">
                 {products?.map(product => (
                     <li key={product.id} className="grid">

@@ -37,3 +37,15 @@ export const productQuery = (productId: string) =>
             return data?.[0] ?? null;
         },
     });
+
+/** A product's effective lease settings, with its config.yml overrides applied. Answers 400 for a disabled product. */
+export const productConfigQuery = (productId: string) =>
+    queryOptions({
+        queryKey: ['get', '/api/v4/products/{productId}/server/config', productId],
+        queryFn: async () =>
+            (
+                await client.GET('/api/v4/products/{productId}/server/config', {
+                    params: { path: { productId } },
+                })
+            )?.data,
+    });

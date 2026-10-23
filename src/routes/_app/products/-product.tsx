@@ -1,15 +1,18 @@
 import { Badge } from '@cryptlex/web-components/components/badge';
 import { Button } from '@cryptlex/web-components/components/button';
 import { CopyButton } from '@cryptlex/web-components/components/copy-button';
-
 import { ProgressBar } from '@cryptlex/web-components/components/progress-bar';
 import { formatDate } from '@cryptlex/web-components/utilities/date';
 import type { ApiSchema } from '@cryptlex/web-components/utilities/resources';
+import { useQuery } from '@tanstack/react-query';
 import { createLink, useRouteContext } from '@tanstack/react-router';
 import type React from 'react';
 import { CardAvatar } from '@/components/card-avatar';
 import { ExpiryValue } from '@/components/expiry-value';
 import { InfoGrid, InfoItem, InfoPanel, InfoTable } from '@/components/info-panel';
+import { StatTiles } from '@/components/stat-tiles';
+import { productConfigQuery } from '@/lib/queries';
+import { DATE_TIME_OPTIONS, formatDuration, getExpiryDisplay } from '@/lib/relative-time';
 import { m } from '@/paraglide/messages.js';
 import { ActivateDialog } from './-activate-dialog';
 import { DeactivateDialog } from './-deactivate-dialog';
@@ -147,7 +150,7 @@ export function ProductCard({ product }: { product: Product }) {
             <ProductHeader product={product} />
             <InfoGrid>
                 <InfoItem
-                    label={m['productsPage.card.seatsUsed']()}
+                    label={m['productsPage.card.seats']()}
                     hint={m['allowedFloatingClients.hint']()}
                     value={seats(product)}
                 />
@@ -166,10 +169,151 @@ export function ProductCard({ product }: { product: Product }) {
     );
 }
 
+/** Headline figures for an activated product: seats in use, lease duration and expiry. */
+function ProductStats({ product }: { product: Product }) {
+    const { data: config } = useQuery(productConfigQuery(product.id));
+    // Same phrasing as the product cards: relative only in the week before expiry.
+    const expiry = getExpiryDisplay(product.expiresAt ? new Date(product.expiresAt * 1000).toISOString() : null);
+
+    return (
+        <StatTiles
+            tiles={[
+                // "0 / 10" already says what it is, so no hint.
+                { label: m['productsPage.card.seats'](), value: seats(product) },
+                {
+                    label: m['leaseDuration.label'](),
+                    hint: m['productsPage.sections.stats.leaseDuration.hint'](),
+                    value: config ? formatDuration(config.leaseDuration) : '',
+                },
+                {
+                    label: m['expiresAt.label'](),
+                    hint: m['expiresAt.hint'](),
+                    // 0 means a perpetual license.
+                    value: expiry.dateTime ? (
+                        <time dateTime={expiry.dateTime}>{expiry.label}</time>
+                    ) : (
+                        m['common.state.never']()
+                    ),
+                    supporting: expiry.supporting,
+                },
+            ]}
+        />
+    );
+}
+
+/** What each leasing strategy means; the value itself is shown as the raw enum. */
+const LEASING_STRATEGY_HINT: Record<string, () => string> = {
+    'per-machine': m['leasingStrategy.perMachine.hint'],
+    'per-instance': m['leasingStrategy.perInstance.hint'],
+};
+
+/** Masked down to its last group so screenshots don't leak it; copy still copies it whole. */
+function LicenseKey({ value }: { value: string }) {
+    return (
+        <span className="flex items-center gap-1">
+            <span className="whitespace-nowrap font-mono">{`••••-••••-${value.split('-').at(-1)}`}</span>
+            <CopyButton variant="ghost" size="icon-sm" label={null} textToCopy={value} />
+        </span>
+    );
+}
+
+function LicenseDetails({ product }: { product: Product }) {
+    const { license } = product;
+    const { data: config } = useQuery(productConfigQuery(product.id));
+    const appName = useRouteContext({ from: '__root__' }).branding.appName ?? '';
+
+    return (
+        <InfoPanel title={m['productsPage.sections.licenseDetails.title']()}>
+            <InfoGrid>
+                {/* The only place the status shows on this page; the header hides its badge. */}
+                <InfoItem
+                    label={m['status.label']()}
+                    hint={STATUS[product.status].hint({ appName })}
+                    value={<Badge variant={STATUS[product.status].variant}>{STATUS[product.status].label()}</Badge>}
+                />
+                {license && (
+                    <>
+                        <InfoItem label={m['key.label']()} value={<LicenseKey value={license.key} />} />
+                        {/* The server only knows whether this license has been online, not how it was first activated. */}
+                        <InfoItem
+                            label={m['offline.label']()}
+                            hint={m['offline.hint']()}
+                            value={
+                                license.activationMode.current === 'offline'
+                                    ? m['common.state.yes']()
+                                    : m['common.state.no']()
+                            }
+                        />
+                        <InfoItem
+                            label={m['activatedAt.label']()}
+                            value={
+                                license.activatedAt ? (
+                                    <time dateTime={new Date(license.activatedAt * 1000).toISOString()}>
+                                        {formatDate(
+                                            new Date(license.activatedAt * 1000).toISOString(),
+                                            DATE_TIME_OPTIONS
+                                        )}
+                                    </time>
+                                ) : (
+                                    ''
+                                )
+                            }
+                        />
+                        <InfoItem
+                            label={m['leasingStrategy.label']()}
+                            hint={LEASING_STRATEGY_HINT[license.leasingStrategy]?.()}
+                            value={<span className="uppercase">{license.leasingStrategy}</span>}
+                            mono
+                        />
+                    </>
+                )}
+                <InfoItem
+                    label={m['offlineSeats.label']()}
+                    hint={m['offlineSeats.hint']()}
+                    value={
+                        config
+                            ? `${product.totalOfflineFloatingClients} / ${limit(config.allowedOfflineFloatingClients)}`
+                            : ''
+                    }
+                />
+                <InfoItem
+                    label={m['maxOfflineLeaseDuration.label']()}
+                    hint={m['maxOfflineLeaseDuration.hint']()}
+                    value={config ? formatDuration(config.maxOfflineLeaseDuration) : ''}
+                />
+            </InfoGrid>
+        </InfoPanel>
+    );
+}
+
+/** Key/value metadata, hidden when there is none. */
+function MetadataPanel({
+    title,
+    hint,
+    metadata,
+}: {
+    title: string;
+    hint: string;
+    metadata: ApiSchema<'Metadata'>[] | null | undefined;
+}) {
+    if (!metadata?.length) return null;
+    return (
+        <InfoPanel title={title} hint={hint} flush>
+            <InfoTable
+                rows={metadata}
+                rowKey={item => item.key}
+                columns={[
+                    { label: m['metadata.key.label'](), render: item => item.key },
+                    { label: m['metadata.value.label'](), render: item => item.value },
+                ]}
+            />
+        </InfoPanel>
+    );
+}
+
 export function ProductDetails({ product }: { product: Product }) {
     const { license } = product;
     const isActivated = license && license.status !== 'not_activated';
-    const appName = useRouteContext({ from: '__root__' }).branding.appName ?? '';
 
     // Nothing to show before activation or while disabled, so the card's prompt is all there is.
     if (product.status === 'not_activated' || product.status === 'disabled') return <ProductCard product={product} />;
@@ -196,100 +340,39 @@ export function ProductDetails({ product }: { product: Product }) {
                 }
             />
 
-            <div className="grid grid-cols-1 gap-icon md:grid-cols-2">
-                <InfoPanel title={m['productsPage.sections.overview.title']()}>
-                    <InfoGrid>
-                        <InfoItem
-                            label={m['allowedFloatingClients.label']()}
-                            hint={m['allowedFloatingClients.hint']()}
-                            value={seats(product)}
-                        />
-                        <InfoItem
-                            label={m['totalOfflineFloatingClients.label']()}
-                            hint={m['totalOfflineFloatingClients.hint']()}
-                            value={product.totalOfflineFloatingClients}
-                        />
-                        <InfoItem
-                            label={m['expiresAt.label']()}
-                            hint={m['expiresAt.hint']()}
-                            value={<ExpiryValue expiresAt={product.expiresAt} />}
-                        />
-                        <InfoItem
-                            label={m['serverSyncGracePeriodExpiresAt.label']()}
-                            hint={m['serverSyncGracePeriodExpiresAt.hint']({ appName })}
-                            value={date(product.serverSyncGracePeriodExpiresAt)}
-                        />
-                        {product.metadata?.map(item => (
-                            <InfoItem key={item.key} label={item.key} value={item.value} />
-                        ))}
-                    </InfoGrid>
-                </InfoPanel>
+            <ProductStats product={product} />
 
-                <InfoPanel title={m['license.label']()}>
-                    <InfoGrid>
-                        <InfoItem
-                            label={m['status.label']()}
-                            hint={STATUS[product.status].hint({ appName })}
-                            value={
-                                <Badge variant={STATUS[product.status].variant}>{STATUS[product.status].label()}</Badge>
-                            }
+            <div className="grid grid-cols-1 gap-icon md:grid-cols-2">
+                <LicenseDetails product={product} />
+
+                {!!license?.meterAttributes?.length && (
+                    <InfoPanel
+                        title={m['productsPage.sections.meterAttributes.title']()}
+                        hint={m['productsPage.sections.meterAttributes.hint']()}
+                        flush
+                    >
+                        <InfoTable
+                            rows={license.meterAttributes}
+                            rowKey={meter => meter.id}
+                            columns={[
+                                { label: m['meterAttributes.name.label'](), render: meter => meter.name },
+                                // Floating meters count uses held by live devices, so the figure can fall (SERVER.md §8.3).
+                                {
+                                    label: m['meterAttributes.uses.label'](),
+                                    render: meter => `${meter.totalUses} / ${limit(meter.allowedUses)}`,
+                                },
+                                { label: m['meterAttributes.grossUses.label'](), render: meter => meter.grossUses },
+                            ]}
                         />
-                        {isActivated && (
-                            <>
-                                <InfoItem
-                                    label={m['key.label']()}
-                                    value={
-                                        <span className="flex items-center gap-1">
-                                            {/* Masked so screenshots don't leak it; the copy button still copies the full key. */}
-                                            {`${license.key.slice(0, 6)}…${license.key.slice(-6)}`}
-                                            <CopyButton
-                                                variant="ghost"
-                                                size="icon-sm"
-                                                label={null}
-                                                textToCopy={license.key}
-                                            />
-                                        </span>
-                                    }
-                                    mono
-                                />
-                                <InfoItem
-                                    label={m['leasingStrategy.label']()}
-                                    hint={m['leasingStrategy.hint']()}
-                                    value={license.leasingStrategy}
-                                />
-                                <InfoItem
-                                    label={m['activationMode.label']()}
-                                    hint={
-                                        license.activationMode.current === 'offline'
-                                            ? m['activationMode.offline.hint']()
-                                            : m['activationMode.online.hint']()
-                                    }
-                                    value={
-                                        license.activationMode.current === 'offline'
-                                            ? m['common.state.offline']()
-                                            : m['common.state.online']()
-                                    }
-                                />
-                                <InfoItem label={m['activatedAt.label']()} value={date(license.activatedAt)} />
-                                {license.user && (
-                                    <InfoItem
-                                        label={m['user.label']()}
-                                        value={[license.user.name, license.user.email].filter(Boolean).join(', ')}
-                                    />
-                                )}
-                                {license.organization && (
-                                    <InfoItem label={m['organization.label']()} value={license.organization.name} />
-                                )}
-                                {license.metadata?.map(item => (
-                                    <InfoItem key={item.key} label={item.key} value={item.value} />
-                                ))}
-                            </>
-                        )}
-                    </InfoGrid>
-                </InfoPanel>
+                    </InfoPanel>
+                )}
 
                 {!!license?.featureEntitlements?.length && (
-                    <InfoPanel title={m['featureEntitlements.label']()} hint={m['featureEntitlements.hint']()} flush>
+                    <InfoPanel
+                        title={m['productsPage.sections.featureEntitlements.title']()}
+                        hint={m['productsPage.sections.featureEntitlements.hint']()}
+                        flush
+                    >
                         <InfoTable
                             rows={license.featureEntitlements}
                             rowKey={feature => feature.featureName}
@@ -309,23 +392,17 @@ export function ProductDetails({ product }: { product: Product }) {
                     </InfoPanel>
                 )}
 
-                {!!license?.meterAttributes?.length && (
-                    <InfoPanel title={m['meterAttributes.label']()} flush>
-                        <InfoTable
-                            rows={license.meterAttributes}
-                            rowKey={meter => meter.id}
-                            columns={[
-                                { label: m['meterAttributes.name.label'](), render: meter => meter.name },
-                                // Floating meters count uses held by live devices, so the figure can fall (SERVER.md §8.3).
-                                {
-                                    label: m['meterAttributes.uses.label'](),
-                                    render: meter => `${meter.totalUses} / ${limit(meter.allowedUses)}`,
-                                },
-                                { label: m['meterAttributes.grossUses.label'](), render: meter => meter.grossUses },
-                            ]}
-                        />
-                    </InfoPanel>
-                )}
+                <MetadataPanel
+                    title={m['productsPage.sections.licenseMetadata.title']()}
+                    hint={m['productsPage.sections.licenseMetadata.hint']()}
+                    metadata={license?.metadata}
+                />
+
+                <MetadataPanel
+                    title={m['productsPage.sections.productMetadata.title']()}
+                    hint={m['productsPage.sections.productMetadata.hint']()}
+                    metadata={product.metadata}
+                />
             </div>
         </article>
     );
