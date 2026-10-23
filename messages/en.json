@@ -68,28 +68,22 @@
         "label": "License",
         "status": {
             "ok": {
-                "label": "Active",
-                "hint": "This license is valid and can be used on activated devices."
+                "label": "Active"
             },
             "notActivated": {
-                "label": "Not Activated",
-                "hint": "This server hasn't activated a license for this product yet, so it can't hand out seats."
+                "label": "Not Activated"
             },
             "expired": {
-                "label": "Expired",
-                "hint": "This license has passed its expiry date and no longer works until it is renewed."
+                "label": "Expired"
             },
             "suspended": {
-                "label": "Suspended",
-                "hint": "This license is temporarily paused. It starts working again on its own once the software vendor lifts the suspension."
+                "label": "Suspended"
             },
             "gracePeriodOver": {
-                "label": "Sync Required",
-                "hint": "This server couldn't sync with {appName} in time, so it stopped handing out seats until it syncs again."
+                "label": "Sync Required"
             },
             "disabled": {
-                "label": "Disabled",
-                "hint": "This product is turned off in config.yml, so this server does not serve it."
+                "label": "Disabled"
             }
         }
     },
@@ -102,12 +96,13 @@
     },
     "leasingStrategy": {
         "label": "Leasing Strategy",
-        "hint": "How seats are counted: per machine gives each device one seat, per instance gives each running copy of the app its own seat.",
         "perMachine": {
-            "hint": "One seat per machine, for all app instances on it."
+            "hint": "One seat per machine, for all app instances on it.",
+            "label": "Per machine"
         },
         "perInstance": {
-            "hint": "One seat per running app instance, even on the same machine."
+            "hint": "One seat per running app instance, even on the same machine.",
+            "label": "Per instance"
         }
     },
     "activatedAt": {
@@ -208,7 +203,6 @@
         "action": {
             "activate": "Activate",
             "activateLicense": "Activate License",
-            "viewProduct": "View Product",
             "deactivate": "Deactivate",
             "sync": "Sync"
         },
@@ -255,49 +249,58 @@
             "notActivated": "No license is activated yet."
         },
         "banner": {
+            "notActivated": {
+                "title": "Activate a License for This Product",
+                "description": "No license is activated for this product yet. Until you activate one, devices can't get a seat from the licensing server."
+            },
             "gracePeriodOver": {
-                "title": "The License Server Needs to Sync",
-                "description": "The license server hasn't synced over the internet for longer than this license allows, so devices can't get a seat. Connect it to the internet and select Sync."
+                "title": "The Licensing Server Needs to Sync",
+                "description": "The licensing server hasn't synced over the internet for longer than this license allows, so devices can't get a seat. Connect it to the internet and select Sync."
             },
             "expired": {
                 "title": "This Product's License Has Expired",
-                "description": "The license for this product has expired, so devices can't get a seat from the license server. Ask your software vendor to renew the license. Then select Sync, or activate again if the server has no internet access."
+                "description": "The license for this product has expired, so devices can't get a seat from the licensing server. Ask your software vendor to renew the license. Then select Sync, or activate again if the server has no internet access."
             },
             "suspended": {
                 "title": "This Product's License Is Suspended",
-                "description": "The license for this product is suspended, so devices can't get a seat from the license server. Contact your software vendor."
+                "description": "The license for this product is suspended, so devices can't get a seat from the licensing server. Contact your software vendor."
             },
             "disabled": {
                 "title": "This Product Is Disabled",
-                "description": "The license server doesn't serve this product, so devices can't get a seat for it. To enable the product, edit {file} and restart the server."
+                "description": "The licensing server doesn't serve this product, so devices can't get a seat for it. To enable the product, edit the server's config and restart the server."
             }
         },
         "activateDialog": {
-            "title": "Activate {product}",
-            "description": "Enter the license key you received for this product. This server needs internet access to reach {appName}.",
+            "title": "Activate License",
+            "description": "Activate the licensing server so it can lease seats for this product.",
+            "error": {
+                "required": "Enter the license key.",
+                "invalidLicenseKey": "This license key isn't valid. Check it and try again.",
+                "networkError": "The licensing server couldn't connect to the internet. Check its connection, or activate offline instead."
+            },
             "toast": {
-                "success": "{product} activated"
+                "success": "License activated."
             }
         },
         "deactivateDialog": {
-            "title": "Deactivate {product}?",
-            "description": "This server stops handing out seats for this product, and devices using it lose their seats when their leases end. You can activate it again later with the same license key.",
+            "title": "Deactivate License",
+            "description": "Deactivate the license for {product}? Seats in use are released right away.",
             "confirmLabel": "Type the License Key to Confirm",
             "error": {
                 "outstandingOffline": "Some devices still hold offline seats. Wait for their leases to end, or return them, before deactivating.",
                 "keyMismatch": "This doesn't match the license key this product is activated with."
             },
             "toast": {
-                "success": "{product} deactivated"
+                "success": "License deactivated."
             }
         }
     },
     "devicesPage": {
         "pageTitle": "Devices",
         "title": "Devices",
-        "searchPlaceholder": "Search by hostname and IP address",
+        "searchPlaceholder": "Search by hostname",
         "action": {
-            "view": "View"
+            "view": "View Details"
         },
         "columns": {
             "hostname": "Hostname",
@@ -307,8 +310,8 @@
             "osUser": "OS User",
             "leaseType": "Lease Type",
             "appVersion": "App Version",
-            "leasedAt": "Leased",
-            "leaseRenewedAt": "Lease Renewed",
+            "leasedAt": "Leased At",
+            "leaseRenewedAt": "Lease Renewed At",
             "leaseExpiresAt": "Lease Expires"
         },
         "details": {
@@ -321,7 +324,7 @@
                 }
             },
             "leaseType": {
-                "hint": "Online leases are renewed while the app runs. Offline leases let the device keep its seat without reaching this server until the lease expires."
+                "hint": "Online leases renew. Offline leases are borrowed and don't."
             },
             "leasedAt": {
                 "hint": "When this device got its seat."

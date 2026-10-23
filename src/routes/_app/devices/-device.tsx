@@ -1,12 +1,8 @@
 import { m } from '@/paraglide/messages.js';
 
-/** Lease type as an enum value (ONLINE / OFFLINE), not a status badge. */
+/** Lease type as plain text (Online / Offline), not a status badge. */
 export function LeaseType({ offline }: { offline: boolean }) {
-    return (
-        <span className="font-mono uppercase">
-            {offline ? m['common.state.offline']() : m['common.state.online']()}
-        </span>
-    );
+    return <span>{offline ? m['common.state.offline']() : m['common.state.online']()}</span>;
 }
 
 // Clients report OS names in lowercase ("macos"); show them with their proper casing.

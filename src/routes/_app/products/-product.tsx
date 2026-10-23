@@ -6,7 +6,7 @@ import { ProgressBar } from '@cryptlex/web-components/components/progress-bar';
 import { formatDate } from '@cryptlex/web-components/utilities/date';
 import type { ApiSchema } from '@cryptlex/web-components/utilities/resources';
 import { useQuery } from '@tanstack/react-query';
-import { createLink, useRouteContext } from '@tanstack/react-router';
+import { createLink } from '@tanstack/react-router';
 import type React from 'react';
 import { CardAvatar } from '@/components/card-avatar';
 import { ExpiryValue } from '@/components/expiry-value';
@@ -26,36 +26,15 @@ export const STATUS: Record<
     Product['status'],
     {
         label: () => string;
-        hint: (inputs: { appName: string }) => string;
         variant: React.ComponentProps<typeof Badge>['variant'];
     }
 > = {
-    ok: { label: m['license.status.ok.label'], hint: m['license.status.ok.hint'], variant: 'success' },
-    not_activated: {
-        label: m['license.status.notActivated.label'],
-        hint: m['license.status.notActivated.hint'],
-        variant: 'warning',
-    },
-    expired: {
-        label: m['license.status.expired.label'],
-        hint: m['license.status.expired.hint'],
-        variant: 'destructive',
-    },
-    suspended: {
-        label: m['license.status.suspended.label'],
-        hint: m['license.status.suspended.hint'],
-        variant: 'warning',
-    },
-    grace_period_over: {
-        label: m['license.status.gracePeriodOver.label'],
-        hint: m['license.status.gracePeriodOver.hint'],
-        variant: 'destructive',
-    },
-    disabled: {
-        label: m['license.status.disabled.label'],
-        hint: m['license.status.disabled.hint'],
-        variant: 'neutral',
-    },
+    ok: { label: m['license.status.ok.label'], variant: 'success' },
+    not_activated: { label: m['license.status.notActivated.label'], variant: 'warning' },
+    expired: { label: m['license.status.expired.label'], variant: 'destructive' },
+    suspended: { label: m['license.status.suspended.label'], variant: 'warning' },
+    grace_period_over: { label: m['license.status.gracePeriodOver.label'], variant: 'destructive' },
+    disabled: { label: m['license.status.disabled.label'], variant: 'neutral' },
 };
 
 /** API timestamps are epoch seconds, and 0 means not set. */
@@ -153,6 +132,15 @@ function Banner({
 /** Why a product can't hand out seats, and the fix. No badge: the header badge already names the state. */
 function StatusBanner({ product }: { product: Product }) {
     switch (product.status) {
+        case 'not_activated':
+            return (
+                <Banner
+                    title={m['productsPage.banner.notActivated.title']()}
+                    actions={<ActivateDialog product={product} />}
+                >
+                    {m['productsPage.banner.notActivated.description']()}
+                </Banner>
+            );
         case 'grace_period_over':
             return (
                 <Banner
@@ -184,19 +172,12 @@ function StatusBanner({ product }: { product: Product }) {
                     {m['productsPage.banner.suspended.description']()}
                 </Banner>
             );
-        case 'disabled': {
-            // Split around a placeholder so the file name can be set in mono inside the translated sentence.
-            const [before, after] = m['productsPage.banner.disabled.description']({ file: '\0' }).split('\0');
+        case 'disabled':
             return (
                 <Banner title={m['productsPage.banner.disabled.title']()} variant="neutral">
-                    {before}
-                    <code className="font-mono">config.yml</code>
-                    {after}
+                    {m['productsPage.banner.disabled.description']()}
                 </Banner>
             );
-        }
-        // A not-activated product shows its card instead.
-        case 'not_activated':
         case 'ok':
             return null;
     }
@@ -207,7 +188,7 @@ const CARD_CLASS =
     'flex flex-col gap-4 rounded-lg border bg-surface-primary p-5 [&_[role=alert]]:border-0 [&_[role=alert]]:p-0';
 const CARD_FOOTER_CLASS = 'mt-auto flex justify-end gap-icon border-t pt-3';
 
-/** Compact product summary; also stands in for the details page while the product is not activated or disabled. */
+/** Compact product summary for the products list. */
 export function ProductCard({ product }: { product: Product }) {
     // One muted line where the seats and expiry would be, so the card isn't empty.
     if (product.status === 'not_activated') {
@@ -260,7 +241,7 @@ export function ProductCard({ product }: { product: Product }) {
             )}
             <footer className={CARD_FOOTER_CLASS}>
                 <ButtonLink variant="primary" to="/products/$productId" params={{ productId: product.id }}>
-                    {m['productsPage.action.viewProduct']()}
+                    {m['common.action.view']()}
                 </ButtonLink>
             </footer>
         </article>
@@ -299,10 +280,10 @@ function ProductStats({ product }: { product: Product }) {
     );
 }
 
-/** What each leasing strategy means; the value itself is shown as the raw enum. */
-const LEASING_STRATEGY_HINT: Record<string, () => string> = {
-    'per-machine': m['leasingStrategy.perMachine.hint'],
-    'per-instance': m['leasingStrategy.perInstance.hint'],
+/** Each leasing strategy's name and what it means. */
+const LEASING_STRATEGY: Record<string, { label: () => string; hint: () => string }> = {
+    'per-machine': { label: m['leasingStrategy.perMachine.label'], hint: m['leasingStrategy.perMachine.hint'] },
+    'per-instance': { label: m['leasingStrategy.perInstance.label'], hint: m['leasingStrategy.perInstance.hint'] },
 };
 
 /** Masked down to its last group so screenshots don't leak it; copy still copies it whole. */
@@ -318,7 +299,6 @@ function LicenseKey({ value }: { value: string }) {
 function LicenseDetails({ product }: { product: Product }) {
     const { license } = product;
     const { data: config } = useQuery(productConfigQuery(product.id));
-    const appName = useRouteContext({ from: '__root__' }).branding.appName ?? '';
 
     return (
         <InfoPanel title={m['productsPage.sections.licenseDetails.title']()}>
@@ -326,7 +306,6 @@ function LicenseDetails({ product }: { product: Product }) {
                 {/* The only place the status shows on this page; the header hides its badge. */}
                 <InfoItem
                     label={m['status.label']()}
-                    hint={STATUS[product.status].hint({ appName })}
                     value={<Badge variant={STATUS[product.status].variant}>{STATUS[product.status].label()}</Badge>}
                 />
                 {license && (
@@ -359,9 +338,8 @@ function LicenseDetails({ product }: { product: Product }) {
                         />
                         <InfoItem
                             label={m['leasingStrategy.label']()}
-                            hint={LEASING_STRATEGY_HINT[license.leasingStrategy]?.()}
-                            value={<span className="uppercase">{license.leasingStrategy}</span>}
-                            mono
+                            hint={LEASING_STRATEGY[license.leasingStrategy]?.hint()}
+                            value={LEASING_STRATEGY[license.leasingStrategy]?.label() ?? license.leasingStrategy}
                         />
                     </>
                 )}
@@ -413,8 +391,15 @@ export function ProductDetails({ product }: { product: Product }) {
     const { license } = product;
     const isActivated = license && license.status !== 'not_activated';
 
-    // Nothing to show before activation or while disabled, so the card's prompt is all there is.
-    if (product.status === 'not_activated' || product.status === 'disabled') return <ProductCard product={product} />;
+    // Nothing to show before activation or while disabled, so the banner's prompt is all there is.
+    if (product.status === 'not_activated' || product.status === 'disabled') {
+        return (
+            <article className={CARD_CLASS}>
+                <ProductHeader product={product} as="h1" showStatus={product.status === 'disabled'} />
+                <StatusBanner product={product} />
+            </article>
+        );
+    }
 
     return (
         <article className="flex flex-col gap-icon">

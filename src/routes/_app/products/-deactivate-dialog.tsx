@@ -59,7 +59,7 @@ function DeactivateConfirm({
         onSuccess: () => {
             toast({
                 variant: 'success',
-                title: m['productsPage.deactivateDialog.toast.success']({ product: product.displayName }),
+                title: m['productsPage.deactivateDialog.toast.success'](),
             });
             queryClient.invalidateQueries({ queryKey: ['get'] });
             onClose();
@@ -82,8 +82,10 @@ function DeactivateConfirm({
     return (
         <Form onSubmit={() => form.handleSubmit()} className="contents">
             <DialogHeader>
-                <DialogTitle>{m['productsPage.deactivateDialog.title']({ product: product.displayName })}</DialogTitle>
-                <DialogDescription>{m['productsPage.deactivateDialog.description']()}</DialogDescription>
+                <DialogTitle>{m['productsPage.deactivateDialog.title']()}</DialogTitle>
+                <DialogDescription>
+                    {m['productsPage.deactivateDialog.description']({ product: product.displayName })}
+                </DialogDescription>
             </DialogHeader>
             <DialogBody className="gap-icon">
                 {/* Retyping the key adds friction so a seat-revoking action isn't one stray click away. */}

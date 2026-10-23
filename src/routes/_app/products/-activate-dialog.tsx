@@ -14,10 +14,8 @@ import { Form } from '@cryptlex/web-components/components/form';
 import { toast } from '@cryptlex/web-components/components/toast';
 import { useAppForm } from '@cryptlex/web-components/utilities/form-hook';
 import type { ApiSchema } from '@cryptlex/web-components/utilities/resources';
-import { V_STRING_REQUIRED } from '@cryptlex/web-components/utilities/validators';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouteContext } from '@tanstack/react-router';
-import { client } from '@/lib/api';
+import { ApiError, client } from '@/lib/api';
 import { m } from '@/paraglide/messages.js';
 
 type Product = ApiSchema<'Product'>;
@@ -36,7 +34,6 @@ export function ActivateDialog({ product }: { product: Product }) {
 
 function ActivateForm({ product, onClose }: { product: Product; onClose: () => void }) {
     const queryClient = useQueryClient();
-    const { branding } = useRouteContext({ from: '__root__' });
 
     const activate = useMutation({
         mutationFn: async (body: ApiSchema<'ServerLicenseActivationRequest'>) =>
@@ -49,7 +46,7 @@ function ActivateForm({ product, onClose }: { product: Product; onClose: () => v
         onSuccess: () => {
             toast({
                 variant: 'success',
-                title: m['productsPage.activateDialog.toast.success']({ product: product.displayName }),
+                title: m['productsPage.activateDialog.toast.success'](),
             });
             queryClient.invalidateQueries({ queryKey: ['get'] });
             onClose();
@@ -61,20 +58,35 @@ function ActivateForm({ product, onClose }: { product: Product; onClose: () => v
         onSubmit: ({ value }) => activate.mutate({ licenseKey: value.licenseKey.trim() }),
     });
 
+    const error = activate.error;
+    // Known codes get their own sentence; anything else falls back to the server's message.
+    const errorMessage =
+        error instanceof ApiError && error.code === 'SERVER_INVALID_LICENSE_KEY'
+            ? m['productsPage.activateDialog.error.invalidLicenseKey']()
+            : error instanceof ApiError && error.code === 'SERVER_NETWORK_ERROR'
+              ? m['productsPage.activateDialog.error.networkError']()
+              : error?.message;
+
     return (
         <Form onSubmit={() => form.handleSubmit()} className="contents">
             <DialogHeader>
-                <DialogTitle>{m['productsPage.activateDialog.title']({ product: product.displayName })}</DialogTitle>
-                <DialogDescription>
-                    {m['productsPage.activateDialog.description']({ appName: branding.appName ?? '' })}
-                </DialogDescription>
+                <DialogTitle>{m['productsPage.activateDialog.title']()}</DialogTitle>
+                <DialogDescription>{m['productsPage.activateDialog.description']()}</DialogDescription>
             </DialogHeader>
             <DialogBody className="gap-icon">
-                <form.AppField name="licenseKey" validators={{ onBlur: V_STRING_REQUIRED }}>
-                    {field => <field.TfTextField label={m['key.label']()} autoComplete="off" autoFocus />}
+                <form.AppField
+                    name="licenseKey"
+                    validators={{
+                        onBlur: ({ value }) =>
+                            value.trim() ? undefined : { message: m['productsPage.activateDialog.error.required']() },
+                    }}
+                >
+                    {field => (
+                        <field.TfTextField label={m['key.label']()} requiredIndicator autoComplete="off" autoFocus />
+                    )}
                 </form.AppField>
                 {/* Errors stay in the dialog so the user can fix the key and retry without retyping it. */}
-                {activate.error && <Alert variant="destructive">{activate.error.message}</Alert>}
+                {errorMessage && <Alert variant="destructive">{errorMessage}</Alert>}
             </DialogBody>
             <DialogFooter>
                 <Button onPress={onClose} isDisabled={activate.isPending}>
