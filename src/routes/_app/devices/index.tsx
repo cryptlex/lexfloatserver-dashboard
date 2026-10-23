@@ -1,6 +1,5 @@
-import { Badge } from '@cryptlex/web-components/components/badge';
 import { DataTable, DataTableProvider, useDataTableState } from '@cryptlex/web-components/components/data-table';
-import type { FiltersConfig } from '@cryptlex/web-components/components/data-table-filter';
+import type { FilterConfig, FiltersConfig } from '@cryptlex/web-components/components/data-table-filter';
 import { IcEye } from '@cryptlex/web-components/components/icons';
 import type { ApiSchema } from '@cryptlex/web-components/utilities/resources';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -10,6 +9,7 @@ import { routerBreadcrumbs } from '@/components/breadcrumbs';
 import { productsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
 import { date } from '../products/-product';
+import { LeaseType } from './-device';
 
 export const Route = createFileRoute('/_app/devices/')({
     beforeLoad: () => routerBreadcrumbs([{ to: '/devices', label: m['devicesPage.pageTitle']() }]),
@@ -82,21 +82,12 @@ function DevicesPage() {
             cell: ({ getValue }) => <span className="font-mono">{getValue()}</span>,
         }),
         columnHelper.accessor('offline', {
-            header: m['devicesPage.columns.lease'](),
-            cell: ({ getValue }) =>
-                getValue() ? (
-                    <Badge variant="neutral">{m['common.state.offline']()}</Badge>
-                ) : (
-                    <Badge variant="success">{m['common.state.online']()}</Badge>
-                ),
-        }),
-        columnHelper.accessor('clientVersion', {
-            header: m['devicesPage.columns.clientVersion'](),
-            enableSorting: false,
+            header: m['devicesPage.columns.leaseType'](),
+            cell: ({ getValue }) => <LeaseType offline={getValue()} />,
         }),
         // Timestamps are epoch seconds, so they can't use `displayType: 'date'`, which expects ISO strings.
         columnHelper.accessor('updatedAt', {
-            header: m['devicesPage.columns.lastSeenAt'](),
+            header: m['devicesPage.columns.leaseRenewedAt'](),
             cell: ({ getValue }) => relativeDate(getValue()),
         }),
         columnHelper.accessor('expiresAt', {
@@ -105,8 +96,9 @@ function DevicesPage() {
         }),
     ];
 
-    // Sent as `productId[in]=a,b` and `offline=true`. Timestamp filters are left out: the date filter sends
-    // ISO strings, and the API only takes unix seconds.
+    // Sent as `productId[in]=a,b` and `offline=true|false`. Lease type is a virtual key, mapped onto `offline`
+    // so the chip reads "Online"/"Offline" instead of "True"/"False". Timestamp filters are left out: the date
+    // filter sends ISO strings, and the API only takes unix seconds.
     // FiltersConfig wants every filterable query param (even `include`); only these two are filters here.
     const filterConfig = {
         ...(hasManyProducts && {
@@ -115,16 +107,22 @@ function DevicesPage() {
                 options: products?.map(product => ({ id: product.id, label: product.displayName })) ?? [],
             },
         }),
-        offline: { type: 'bool' },
-    } satisfies Partial<FiltersConfig<'listFloatingLicenses'>> as FiltersConfig<'listFloatingLicenses'>;
+        leaseType: {
+            type: 'derived-select',
+            options: [
+                { id: 'online', label: m['common.state.online']() },
+                { id: 'offline', label: m['common.state.offline']() },
+            ],
+            toApiQuery: value => ({ offline: value === 'offline' }),
+        },
+    } satisfies Record<string, FilterConfig> as unknown as FiltersConfig<'listFloatingLicenses'>;
 
     const state = useDataTableState<ApiSchema<'FloatingLicense'>, 'listFloatingLicenses'>({
         path: '/api/v4/floating-licenses',
         columns,
-        columnsToHideByDefault: { clientVersion: true },
         filterConfig,
         initialFilters: [],
-        previewFilters: hasManyProducts ? ['productId', 'offline'] : ['offline'],
+        previewFilters: hasManyProducts ? ['productId', 'leaseType'] : ['leaseType'],
         tableActions: [
             {
                 resourceType: 'single',

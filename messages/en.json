@@ -6,13 +6,14 @@
             "enabled": "Enabled",
             "disabled": "Disabled",
             "none": "None",
-            "default": "Default",
             "unlimited": "Unlimited",
             "online": "Online",
             "offline": "Offline",
             "never": "Never",
             "yes": "Yes",
-            "no": "No"
+            "no": "No",
+            "on": "On",
+            "off": "Off"
         },
         "unit": {
             "seconds": "{count} seconds",
@@ -124,7 +125,6 @@
         }
     },
     "meterAttributes": {
-        "label": "Usage Limits",
         "name": {
             "label": "Name"
         },
@@ -136,38 +136,33 @@
         }
     },
     "version": {
-        "label": "Version"
+        "label": "Version",
+        "hint": "Licensing server version."
     },
     "port": {
         "label": "Port"
     },
-    "cryptlexHost": {
-        "label": "Host"
-    },
     "leaseDuration": {
-        "label": "Lease Duration",
-        "hint": "How long a device can hold a seat without checking in. Products use this unless they override it. If the app closes without releasing its seat, for example after a crash, the seat becomes free when the lease runs out."
+        "label": "Lease duration",
+        "hint": "How long a device keeps a seat between renewals."
     },
     "allowedClockOffset": {
-        "label": "Allowed Clock Offset",
-        "hint": "How far a device's clock can differ from this server's before its requests are refused."
-    },
-    "ssl": {
-        "label": "SSL"
+        "label": "Allowed clock offset",
+        "hint": "Allowed clock drift between the server and client."
     },
     "admins": {
-        "label": "Admin Users"
+        "label": "Admin users",
+        "hint": "Users who can sign in."
     },
     "blockedIps": {
-        "label": "Blocked IPs",
-        "hint": "IP addresses refused by this server."
+        "label": "Blocked IP addresses"
     },
     "trustedProxies": {
-        "label": "Trusted Proxies",
-        "hint": "Proxies whose forwarded client IP this server accepts."
+        "label": "Trusted proxies",
+        "hint": "Proxies allowed to forward requests."
     },
     "logLevel": {
-        "label": "Log Level",
+        "label": "Log level",
         "debug": {
             "label": "Debug"
         },
@@ -182,19 +177,21 @@
         }
     },
     "consoleLogs": {
-        "label": "Console Logs"
+        "label": "Console logging"
     },
     "fileLogs": {
-        "label": "File Logs"
+        "label": "File logging"
     },
     "logDirectory": {
-        "label": "Log Directory"
+        "label": "Log directory"
     },
     "maxFileSize": {
-        "label": "Max File Size"
+        "label": "Max file size",
+        "hint": "Size before a new log file starts."
     },
     "maxBackups": {
-        "label": "Max Backups"
+        "label": "Backups kept",
+        "hint": "Old log files to keep, per product."
     },
     "authPage": {
         "login": {
@@ -293,11 +290,11 @@
             "ipAddress": "IP address",
             "os": "Operating system",
             "osUser": "OS user",
-            "lease": "Lease",
-            "clientVersion": "Client version",
-            "lastSeenAt": "Last seen",
-            "leaseExpiresAt": "Lease expires",
-            "firstSeenAt": "First seen"
+            "leaseType": "Lease type",
+            "appVersion": "App version",
+            "leasedAt": "Leased at",
+            "leaseRenewedAt": "Lease renewed at",
+            "leaseExpiresAt": "Lease expires"
         },
         "details": {
             "sections": {
@@ -306,33 +303,35 @@
                 },
                 "lease": {
                     "title": "Lease"
-                },
-                "metadata": {
-                    "title": "Metadata"
                 }
             },
-            "lease": {
+            "leaseType": {
                 "hint": "Online leases are renewed while the app runs. Offline leases let the device keep its seat without reaching this server until the lease expires."
             },
-            "lastSeenAt": {
-                "hint": "When the device last renewed its lease."
+            "leasedAt": {
+                "hint": "When this device got its seat."
             },
-            "meterAttributes": {
-                "hint": "Uses held by this device only."
+            "leaseRenewedAt": {
+                "hint": "When the lease was last renewed."
+            },
+            "leaseExpiresAt": {
+                "hint": "When the seat is freed if the lease isn't renewed."
             }
         }
     },
     "settingsPage": {
         "pageTitle": "Settings",
+        "banner": "These settings come from the licensing server's config. To change them, edit the config and restart the server.",
         "sections": {
             "server": {
                 "title": "Server"
             },
-            "configuration": {
-                "title": "Configuration"
-            },
             "logging": {
                 "title": "Logging"
+            },
+            "productDefaults": {
+                "title": "Product defaults",
+                "hint": "Used unless a product or license overrides it."
             }
         }
     },
@@ -355,5 +354,13 @@
         "value": {
             "label": "Value"
         }
+    },
+    "tls": {
+        "label": "TLS",
+        "hint": "Not needed on a local network. For HTTPS, generate a self-signed certificate and add it to config.yml."
+    },
+    "enableIpv6": {
+        "label": "IPv6",
+        "hint": "Accept IPv6 connections."
     }
 }

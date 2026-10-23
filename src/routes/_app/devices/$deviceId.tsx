@@ -1,13 +1,13 @@
-import { Badge } from '@cryptlex/web-components/components/badge';
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link, notFound } from '@tanstack/react-router';
 import { routerBreadcrumbs } from '@/components/breadcrumbs';
 import { CardAvatar } from '@/components/card-avatar';
-import { InfoGrid, InfoItem, InfoPanel, InfoTable } from '@/components/info-panel';
+import { InfoGrid, InfoItem, InfoPanel } from '@/components/info-panel';
 import { ApiError, client } from '@/lib/api';
 import { productsQuery } from '@/lib/queries';
 import { m } from '@/paraglide/messages.js';
 import { date } from '../products/-product';
+import { formatOs, LeaseType } from './-device';
 
 const deviceQuery = (id: string) =>
     queryOptions({
@@ -68,24 +68,10 @@ function DevicePage() {
                 <InfoPanel title={m['devicesPage.details.sections.device.title']()}>
                     <InfoGrid>
                         <InfoItem label={m['devicesPage.columns.hostname']()} value={device.hostname} />
-                        <InfoItem
-                            label={m['devicesPage.columns.lease']()}
-                            hint={m['devicesPage.details.lease.hint']()}
-                            value={
-                                device.offline ? (
-                                    <Badge variant="neutral">{m['common.state.offline']()}</Badge>
-                                ) : (
-                                    <Badge variant="success">{m['common.state.online']()}</Badge>
-                                )
-                            }
-                        />
                         <InfoItem label={m['devicesPage.columns.ipAddress']()} value={device.ip} mono />
-                        <InfoItem
-                            label={m['devicesPage.columns.os']()}
-                            value={[device.os, device.osVersion].filter(Boolean).join(' ')}
-                        />
+                        <InfoItem label={m['devicesPage.columns.os']()} value={formatOs(device.os, device.osVersion)} />
                         <InfoItem label={m['devicesPage.columns.osUser']()} value={device.username} />
-                        <InfoItem label={m['devicesPage.columns.clientVersion']()} value={device.clientVersion} mono />
+                        <InfoItem label={m['devicesPage.columns.appVersion']()} value={device.clientVersion} />
                     </InfoGrid>
                 </InfoPanel>
 
@@ -105,42 +91,28 @@ function DevicePage() {
                                 }
                             />
                         )}
-                        <InfoItem label={m['devicesPage.columns.firstSeenAt']()} value={date(device.createdAt)} />
                         <InfoItem
-                            label={m['devicesPage.columns.lastSeenAt']()}
-                            hint={m['devicesPage.details.lastSeenAt.hint']()}
+                            label={m['devicesPage.columns.leaseType']()}
+                            hint={m['devicesPage.details.leaseType.hint']()}
+                            value={<LeaseType offline={device.offline} />}
+                        />
+                        <InfoItem
+                            label={m['devicesPage.columns.leasedAt']()}
+                            hint={m['devicesPage.details.leasedAt.hint']()}
+                            value={date(device.createdAt)}
+                        />
+                        <InfoItem
+                            label={m['devicesPage.columns.leaseRenewedAt']()}
+                            hint={m['devicesPage.details.leaseRenewedAt.hint']()}
                             value={date(device.updatedAt)}
                         />
-                        <InfoItem label={m['devicesPage.columns.leaseExpiresAt']()} value={date(device.expiresAt)} />
+                        <InfoItem
+                            label={m['devicesPage.columns.leaseExpiresAt']()}
+                            hint={m['devicesPage.details.leaseExpiresAt.hint']()}
+                            value={date(device.expiresAt)}
+                        />
                     </InfoGrid>
                 </InfoPanel>
-
-                {!!device.metadata?.length && (
-                    <InfoPanel title={m['devicesPage.details.sections.metadata.title']()}>
-                        <InfoGrid>
-                            {device.metadata.map(item => (
-                                <InfoItem key={item.key} label={item.key} value={item.value} />
-                            ))}
-                        </InfoGrid>
-                    </InfoPanel>
-                )}
-
-                {!!device.meterAttributes?.length && (
-                    <InfoPanel
-                        title={m['meterAttributes.label']()}
-                        hint={m['devicesPage.details.meterAttributes.hint']()}
-                        flush
-                    >
-                        <InfoTable
-                            rows={device.meterAttributes}
-                            rowKey={meter => meter.name}
-                            columns={[
-                                { label: m['meterAttributes.name.label'](), render: meter => meter.name },
-                                { label: m['meterAttributes.uses.label'](), render: meter => meter.uses },
-                            ]}
-                        />
-                    </InfoPanel>
-                )}
             </div>
         </article>
     );
