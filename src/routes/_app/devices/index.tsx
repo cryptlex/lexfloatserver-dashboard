@@ -64,7 +64,7 @@ function DevicesPage() {
         }),
         columnHelper.accessor('offline', {
             header: m['devicesPage.columns.leaseType'](),
-            cell: ({ getValue }) => <LeaseType offline={getValue()} />,
+            cell: ({ getValue }) => <LeaseType offline={getValue()} className="font-mono uppercase" />,
         }),
         // Timestamps are epoch seconds, so they can't use `displayType: 'date'`, which expects ISO strings.
         // A past renewal reads as a plain date; an expiry inside the next week reads relatively.
