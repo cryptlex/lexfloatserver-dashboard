@@ -153,7 +153,7 @@
     },
     "admins": {
         "label": "Admin users",
-        "hint": "Users who can sign in."
+        "hint": "Users who can log in."
     },
     "blockedIps": {
         "label": "Blocked IP addresses"
@@ -196,11 +196,11 @@
     },
     "authPage": {
         "login": {
-            "pageTitle": "Sign in",
-            "title": "Sign in",
+            "pageTitle": "Log in",
+            "title": "Log in",
             "description": "Use an admin username and password from the licensing server's config.",
             "action": {
-                "submit": "Sign in"
+                "submit": "Log in"
             },
             "error": {
                 "invalidCredentials": "Username or password is incorrect."
