@@ -123,8 +123,8 @@ function Banner({
     title: string;
     children: React.ReactNode;
     actions?: React.ReactNode;
-    /** Shows the banner as an alert, for a product that is activated but can't hand out seats. */
-    variant?: 'destructive' | 'warning';
+    /** Shows the banner as an alert, for a product that can't hand out seats. */
+    variant?: 'destructive' | 'warning' | 'neutral';
 }) {
     if (variant) {
         return (
@@ -197,7 +197,7 @@ function StatusBanner({ product }: { product: Product }) {
             // Split around a placeholder so the file name can be set in mono inside the translated sentence.
             const [before, after] = m['productsPage.banner.disabled.description']({ file: '\0' }).split('\0');
             return (
-                <Banner title={m['productsPage.banner.disabled.title']()}>
+                <Banner title={m['productsPage.banner.disabled.title']()} variant="neutral">
                     {before}
                     <code className="font-mono">config.yml</code>
                     {after}
@@ -209,11 +209,15 @@ function StatusBanner({ product }: { product: Product }) {
     }
 }
 
+/** The card's own border frames a status alert, so the alert drops its border and padding. */
+const CARD_CLASS =
+    'flex flex-col gap-4 rounded-lg border bg-surface-primary p-5 [&_[role=alert]]:border-0 [&_[role=alert]]:p-0';
+
 /** Compact product summary; also stands in for the details page while the product is not activated or disabled. */
 export function ProductCard({ product }: { product: Product }) {
     if (product.status === 'not_activated' || product.status === 'disabled') {
         return (
-            <article className="flex flex-col gap-4 rounded-lg border bg-surface-primary p-5">
+            <article className={CARD_CLASS}>
                 <ProductHeader product={product} />
                 <StatusBanner product={product} />
             </article>
@@ -221,20 +225,25 @@ export function ProductCard({ product }: { product: Product }) {
     }
 
     return (
-        <article className="flex flex-col gap-4 rounded-lg border bg-surface-primary p-5">
+        <article className={CARD_CLASS}>
             <ProductHeader product={product} />
-            <InfoGrid>
-                <InfoItem
-                    label={m['productsPage.card.seats']()}
-                    hint={m['allowedFloatingClients.hint']()}
-                    value={seats(product)}
-                />
-                <InfoItem
-                    label={m['expiresAt.label']()}
-                    hint={m['expiresAt.hint']()}
-                    value={<ExpiryValue expiresAt={product.expiresAt} />}
-                />
-            </InfoGrid>
+            {/* A license that can't hand out seats shows only why, not its figures. */}
+            {product.status === 'ok' ? (
+                <InfoGrid>
+                    <InfoItem
+                        label={m['productsPage.card.seats']()}
+                        hint={m['allowedFloatingClients.hint']()}
+                        value={seats(product)}
+                    />
+                    <InfoItem
+                        label={m['expiresAt.label']()}
+                        hint={m['expiresAt.hint']()}
+                        value={<ExpiryValue expiresAt={product.expiresAt} />}
+                    />
+                </InfoGrid>
+            ) : (
+                <StatusBanner product={product} />
+            )}
             <footer className="mt-auto flex justify-end border-t pt-3">
                 <ButtonLink variant="primary" to="/products/$productId" params={{ productId: product.id }}>
                     {m['productsPage.action.viewProduct']()}
