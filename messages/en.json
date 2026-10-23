@@ -23,6 +23,16 @@
             "requestFailed": "Request failed with status {status}"
         }
     },
+    "time": {
+        "in": {
+            "minute": "In 1 minute",
+            "minutes": "In {count} minutes",
+            "hour": "In 1 hour",
+            "hours": "In {count} hours",
+            "day": "In 1 day",
+            "days": "In {count} days"
+        }
+    },
     "nav": {
         "server": "Server",
         "products": "Products",
@@ -206,6 +216,8 @@
         "pageTitle": "Products",
         "action": {
             "activate": "Activate",
+            "activateLicense": "Activate license",
+            "viewProduct": "View product",
             "forceSync": "Force Sync",
             "deactivate": "Deactivate"
         },
@@ -217,13 +229,24 @@
                 "products": {
                     "label": "Products"
                 },
-                "devices": {
-                    "label": "Devices",
-                    "description": "{count} offline"
+                "activeDevices": {
+                    "label": "Active devices"
+                },
+                "offlineDevices": {
+                    "label": "Offline devices"
                 }
             }
         },
-        "activateHint": "This product isn’t activated yet. Select Activate to activate its license online or offline.",
+        "card": {
+            "seatsUsed": "Seats used"
+        },
+        "disabled": {
+            "description": "Disabled in {file}, so this server does not serve it."
+        },
+        "notActivated": {
+            "title": "Activate a license for this product",
+            "description": "This product has no active server license. {appName} refuses every lease request for it until one is activated."
+        },
         "activateDialog": {
             "title": "Activate {product}",
             "description": "Enter the license key you received for this product. This server needs internet access to reach {appName}.",

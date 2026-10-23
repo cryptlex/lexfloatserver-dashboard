@@ -1,6 +1,6 @@
 import { ToastProvider } from '@cryptlex/web-components/components/toast';
 import { CtxClientProvider } from '@cryptlex/web-components/utilities/ctx-client';
-import type { ApiSchema } from '@cryptlex/web-components/utilities/resources';
+import { type ApiSchema, ProjectProvider } from '@cryptlex/web-components/utilities/resources';
 import { setThemeHue } from '@cryptlex/web-components/utilities/theme';
 import { type QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRootRouteWithContext, HeadContent, Outlet, useRouteContext } from '@tanstack/react-router';
@@ -27,12 +27,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootComponent() {
     const { queryClient } = useRouteContext({ from: '__root__' });
     return (
-        <CtxClientProvider client={client}>
-            <QueryClientProvider client={queryClient}>
-                <HeadContent />
-                <ToastProvider />
-                <Outlet />
-            </QueryClientProvider>
-        </CtxClientProvider>
+        // Readers are customers running their own server, so use the customer-facing resource names.
+        <ProjectProvider projectName="lexfloatserver-dashboard">
+            <CtxClientProvider client={client}>
+                <QueryClientProvider client={queryClient}>
+                    <HeadContent />
+                    <ToastProvider />
+                    <Outlet />
+                </QueryClientProvider>
+            </CtxClientProvider>
+        </ProjectProvider>
     );
 }

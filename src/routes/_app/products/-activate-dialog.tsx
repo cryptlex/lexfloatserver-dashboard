@@ -26,7 +26,7 @@ type Product = ApiSchema<'Product'>;
 export function ActivateDialog({ product }: { product: Product }) {
     return (
         <DialogTrigger>
-            <Button variant="primary">{m['productsPage.action.activate']()}</Button>
+            <Button variant="primary">{m['productsPage.action.activateLicense']()}</Button>
             <DialogOverlay>
                 <DialogContent>{({ close }) => <ActivateForm product={product} onClose={close} />}</DialogContent>
             </DialogOverlay>

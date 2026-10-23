@@ -1,13 +1,14 @@
 import { Badge } from '@cryptlex/web-components/components/badge';
 import { Button } from '@cryptlex/web-components/components/button';
 import { CopyButton } from '@cryptlex/web-components/components/copy-button';
-import { IcEye } from '@cryptlex/web-components/components/icons';
+
 import { ProgressBar } from '@cryptlex/web-components/components/progress-bar';
 import { formatDate } from '@cryptlex/web-components/utilities/date';
 import type { ApiSchema } from '@cryptlex/web-components/utilities/resources';
 import { createLink, useRouteContext } from '@tanstack/react-router';
 import type React from 'react';
 import { CardAvatar } from '@/components/card-avatar';
+import { ExpiryValue } from '@/components/expiry-value';
 import { InfoGrid, InfoItem, InfoPanel, InfoTable } from '@/components/info-panel';
 import { m } from '@/paraglide/messages.js';
 import { ActivateDialog } from './-activate-dialog';
@@ -29,7 +30,7 @@ export const STATUS: Record<
     not_activated: {
         label: m['license.status.notActivated.label'],
         hint: m['license.status.notActivated.hint'],
-        variant: 'neutral',
+        variant: 'warning',
     },
     expired: {
         label: m['license.status.expired.label'],
@@ -67,7 +68,9 @@ export function seats(product: Product) {
             minValue={0}
             maxValue={product.allowedFloatingClients}
             value={product.totalFloatingClients}
-            meterClassName="w-25"
+            // Count above the bar.
+            className="flex-col-reverse items-start"
+            meterClassName="w-50"
             label={label}
         />
     );
@@ -102,36 +105,62 @@ export function ProductHeader({
     );
 }
 
-/** Compact product summary; also stands in for the details page while the product is not activated. */
+/** Compact product summary; also stands in for the details page while the product is not activated or disabled. */
 export function ProductCard({ product }: { product: Product }) {
     const isActivated = product.status !== 'not_activated';
-    return (
-        <article className="flex flex-col gap-3 rounded-lg border bg-surface-primary p-4">
-            <ProductHeader product={product} />
-            {isActivated && product.enabled && (
-                <InfoGrid>
-                    <InfoItem
-                        label={m['allowedFloatingClients.label']()}
-                        hint={m['allowedFloatingClients.hint']()}
-                        value={seats(product)}
-                    />
-                    <InfoItem
-                        label={m['expiresAt.label']()}
-                        hint={m['expiresAt.hint']()}
-                        value={date(product.expiresAt)}
-                    />
-                </InfoGrid>
-            )}
-            {!isActivated && <p className="text-sm text-text-secondary">{m['productsPage.activateHint']()}</p>}
-            <footer className="mt-auto flex justify-end gap-icon">
-                {isActivated ? (
-                    <ButtonLink to="/products/$productId" params={{ productId: product.id }}>
-                        <IcEye />
-                        {m['common.action.view']()}
-                    </ButtonLink>
-                ) : (
+    const appName = useRouteContext({ from: '__root__' }).branding.appName ?? '';
+
+    if (!isActivated) {
+        return (
+            <article className="flex flex-col gap-4 rounded-lg border bg-surface-primary p-5">
+                <ProductHeader product={product} />
+                <div className="flex flex-col gap-1">
+                    <h3 className="font-semibold text-foreground">{m['productsPage.notActivated.title']()}</h3>
+                    <p className="text-sm text-text-secondary">
+                        {m['productsPage.notActivated.description']({ appName })}
+                    </p>
+                </div>
+                <footer className="mt-auto flex justify-end border-t pt-3">
                     <ActivateDialog product={product} />
-                )}
+                </footer>
+            </article>
+        );
+    }
+
+    if (product.status === 'disabled') {
+        // Split around a placeholder so the file name can be set in mono inside the translated sentence.
+        const [before, after] = m['productsPage.disabled.description']({ file: '\0' }).split('\0');
+        return (
+            <article className="flex flex-col gap-4 rounded-lg border bg-surface-primary p-5">
+                <ProductHeader product={product} />
+                <p className="text-sm text-text-secondary">
+                    {before}
+                    <code className="font-mono">config.yml</code>
+                    {after}
+                </p>
+            </article>
+        );
+    }
+
+    return (
+        <article className="flex flex-col gap-4 rounded-lg border bg-surface-primary p-5">
+            <ProductHeader product={product} />
+            <InfoGrid>
+                <InfoItem
+                    label={m['productsPage.card.seatsUsed']()}
+                    hint={m['allowedFloatingClients.hint']()}
+                    value={seats(product)}
+                />
+                <InfoItem
+                    label={m['expiresAt.label']()}
+                    hint={m['expiresAt.hint']()}
+                    value={<ExpiryValue expiresAt={product.expiresAt} />}
+                />
+            </InfoGrid>
+            <footer className="mt-auto flex justify-end border-t pt-3">
+                <ButtonLink variant="primary" to="/products/$productId" params={{ productId: product.id }}>
+                    {m['productsPage.action.viewProduct']()}
+                </ButtonLink>
             </footer>
         </article>
     );
@@ -142,8 +171,8 @@ export function ProductDetails({ product }: { product: Product }) {
     const isActivated = license && license.status !== 'not_activated';
     const appName = useRouteContext({ from: '__root__' }).branding.appName ?? '';
 
-    // Nothing to show before activation, so offer just the activate prompt.
-    if (product.status === 'not_activated') return <ProductCard product={product} />;
+    // Nothing to show before activation or while disabled, so the card's prompt is all there is.
+    if (product.status === 'not_activated' || product.status === 'disabled') return <ProductCard product={product} />;
 
     return (
         <article className="flex flex-col gap-icon">
@@ -183,7 +212,7 @@ export function ProductDetails({ product }: { product: Product }) {
                         <InfoItem
                             label={m['expiresAt.label']()}
                             hint={m['expiresAt.hint']()}
-                            value={date(product.expiresAt)}
+                            value={<ExpiryValue expiresAt={product.expiresAt} />}
                         />
                         <InfoItem
                             label={m['serverSyncGracePeriodExpiresAt.label']()}

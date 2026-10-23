@@ -167,8 +167,8 @@ importers:
   .:
     dependencies:
       '@cryptlex/web-components':
-        specifier: 6.8.0
-        version: 6.8.0(e72761e4bab86577e34fa4b07adad124)
+        specifier: 6.8.3
+        version: 6.8.3(e72761e4bab86577e34fa4b07adad124)
       '@tailwindcss/vite':
         specifier: 4.3.3
         version: 4.3.3(vite@8.2.2(@types/node@22.19.1)(jiti@2.7.0)(yaml@2.5.1))
@@ -440,8 +440,8 @@ packages:
   '@bytecodealliance/preview3-shim@0.6.1':
     resolution: {integrity: sha512-61mEfjfgGmZhEMA0H3waawPKvYd3za9y0vJ7pmQz/9yvm4FR6Ef+cmqhnxDE7ezsM07MY1btP92ymmgsgFwxmg==}
 
-  '@cryptlex/web-components@6.8.0':
-    resolution: {integrity: sha512-EsIcIr0cVml9MIuriEhTqcY+VQ17Y6BZSXhkRI7K9d2+LJidO8Ae2nG174rf34StXQh3KX/L3pAwAK49fK08Pw==}
+  '@cryptlex/web-components@6.8.3':
+    resolution: {integrity: sha512-Bxco+/Z1HGgGaO7x5YPBgGm8Y3TF1lt/A7gBu16sxeeS1dmuQMlj2is1nchhrnEsjwELceogkWfwSnWZZjaYdQ==}
     engines: {node: '>=20'}
     peerDependencies:
       '@dnd-kit/core': 6.3.1
@@ -2451,7 +2451,7 @@ snapshots:
       '@bytecodealliance/jco-node-fs': 0.3.2
       '@bytecodealliance/preview2-shim': 0.25.0
 
-  '@cryptlex/web-components@6.8.0(e72761e4bab86577e34fa4b07adad124)':
+  '@cryptlex/web-components@6.8.3(e72761e4bab86577e34fa4b07adad124)':
     dependencies:
       '@dnd-kit/core': 6.3.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       '@dnd-kit/sortable': 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8))(react@19.2.8)

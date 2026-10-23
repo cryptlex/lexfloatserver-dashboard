@@ -28,25 +28,21 @@ function ProductsPage() {
 
     const tiles = [
         { label: m['productsPage.sections.stats.products.label'](), value: stats?.productCount },
-        {
-            label: m['productsPage.sections.stats.devices.label'](),
-            value: stats?.totalFloatingClients,
-            description: m['productsPage.sections.stats.devices.description']({
-                count: stats?.totalOfflineFloatingClients ?? 0,
-            }),
-        },
+        { label: m['productsPage.sections.stats.activeDevices.label'](), value: stats?.totalFloatingClients },
+        { label: m['productsPage.sections.stats.offlineDevices.label'](), value: stats?.totalOfflineFloatingClients },
     ];
 
     return (
         <div className="flex flex-col gap-icon">
-            <dl className="grid grid-cols-2 gap-icon">
+            <dl className="grid grid-cols-1 gap-icon sm:grid-cols-3">
                 {tiles.map(tile => (
-                    <div key={tile.label} className="rounded-lg border bg-surface-primary p-4">
+                    <div key={tile.label} className="flex flex-col gap-2 rounded-lg border bg-surface-primary p-5">
                         <dt className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
                             {tile.label}
                         </dt>
-                        <dd className="heading-3">{tile.value}</dd>
-                        {tile.description && <dd className="text-sm text-text-secondary">{tile.description}</dd>}
+                        <dd className="text-[1.375rem] font-semibold tracking-[-0.02em] text-foreground">
+                            {tile.value}
+                        </dd>
                     </div>
                 ))}
             </dl>

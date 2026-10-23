@@ -23,7 +23,7 @@
         ]
     },
     "dependencies": {
-        "@cryptlex/web-components": "6.8.0",
+        "@cryptlex/web-components": "6.8.3",
         "@tailwindcss/vite": "4.3.3",
         "@tanstack/react-query": "5.102.7",
         "@tanstack/react-router": "1.170.32",
