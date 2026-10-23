@@ -19,7 +19,8 @@ The reader is the customer's IT admin or ops engineer running LexFloatServer on 
 
 ## Capitalization
 
-- **Title Case** for labels, column headers, headings, section titles, dialog titles, browser tab titles (`pageTitle`), nav items, button text and status values: "Lease Duration", "Activate License", "Not Activated", "Log Out". Not "Lease duration", "Not activated".
+- **Title Case** for every title and button: labels (including form field labels), column headers, headings, page, section, card, banner and dialog titles, browser tab titles (`pageTitle`), stat labels, nav and menu items, button text and status values: "Lease Duration", "Activate License", "Not Activated", "Log Out". Not "Lease duration", "Not activated".
+- **Sentence case** for running text: hints, descriptions, banner and dialog body text, toasts and errors.
 - In Title Case, lowercase articles, conjunctions and short prepositions (a, an, the, and, or, to, by, for, in, of, on, with) unless they are the first or last word: "Log In with SSO", "Max Offline Lease Duration".
 - **Exception: input placeholders** (shown inside a search field) use sentence case and no period: "Find by hostname".
 - **"ID" is always uppercase**, alone or in a compound: "ID", "Product ID". Never "Id".
@@ -45,5 +46,5 @@ The reader is the customer's IT admin or ops engineer running LexFloatServer on 
 - **Confirmations for destructive actions** name the thing and the consequence: "Deactivate this license? Devices can't lease it until you activate it again." The dialog title is the action as a question ("Deactivate License?"), never "Are You Sure?".
 - **Empty states** say what would be here and what to do next: "No devices yet. Devices appear here once your app leases a license from this server."
 - **Toasts** confirm what happened in past tense: "License activated", not "Success!". Failure toasts say what failed and what to do: "The license couldn't be activated. Try again."
-- **Placeholders that insert a Title Case name** go in a title or at the start of a sentence ("{product} Activated"), never mid-sentence. Don't build plurals by appending "s" to a placeholder; use a count message instead (see `time.duration.day` / `time.duration.days`).
+- **Placeholders that insert a Title Case name** go in a title or at the start of a sentence ("Activate {product}", "{product} activated"), never mid-sentence. Don't build plurals by appending "s" to a placeholder; use a count message instead (see `time.duration.day` / `time.duration.days`).
 - **Numbers as numerals** ("3 devices", not "three devices"), and use placeholders instead of joining sentence fragments so the sentence still reads naturally when translated.

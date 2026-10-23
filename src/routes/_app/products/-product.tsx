@@ -153,15 +153,6 @@ function Banner({
 /** Why a product can't hand out seats, and the fix. No badge: the header badge already names the state. */
 function StatusBanner({ product }: { product: Product }) {
     switch (product.status) {
-        case 'not_activated':
-            return (
-                <Banner
-                    title={m['productsPage.banner.notActivated.title']()}
-                    actions={<ActivateDialog product={product} />}
-                >
-                    {m['productsPage.banner.notActivated.description']()}
-                </Banner>
-            );
         case 'grace_period_over':
             return (
                 <Banner
@@ -204,6 +195,8 @@ function StatusBanner({ product }: { product: Product }) {
                 </Banner>
             );
         }
+        // A not-activated product shows its card instead.
+        case 'not_activated':
         case 'ok':
             return null;
     }
@@ -212,10 +205,24 @@ function StatusBanner({ product }: { product: Product }) {
 /** The card's own border frames a status alert, so the alert drops its border and padding. */
 const CARD_CLASS =
     'flex flex-col gap-4 rounded-lg border bg-surface-primary p-5 [&_[role=alert]]:border-0 [&_[role=alert]]:p-0';
+const CARD_FOOTER_CLASS = 'mt-auto flex justify-end gap-icon border-t pt-3';
 
 /** Compact product summary; also stands in for the details page while the product is not activated or disabled. */
 export function ProductCard({ product }: { product: Product }) {
-    if (product.status === 'not_activated' || product.status === 'disabled') {
+    // One muted line where the seats and expiry would be, so the card isn't empty.
+    if (product.status === 'not_activated') {
+        return (
+            <article className={CARD_CLASS}>
+                <ProductHeader product={product} />
+                <p className="text-sm text-text-secondary">{m['productsPage.card.notActivated']()}</p>
+                <footer className={CARD_FOOTER_CLASS}>
+                    <ActivateDialog product={product} />
+                </footer>
+            </article>
+        );
+    }
+
+    if (product.status === 'disabled') {
         return (
             <article className={CARD_CLASS}>
                 <ProductHeader product={product} />
@@ -231,20 +238,27 @@ export function ProductCard({ product }: { product: Product }) {
             {product.status === 'ok' ? (
                 <InfoGrid>
                     <InfoItem
-                        label={m['productsPage.card.seats']()}
-                        hint={m['allowedFloatingClients.hint']()}
+                        label={m['productsPage.card.seats.label']()}
+                        hint={m['productsPage.card.seats.hint']()}
                         value={seats(product)}
                     />
                     <InfoItem
                         label={m['expiresAt.label']()}
                         hint={m['expiresAt.hint']()}
-                        value={<ExpiryValue expiresAt={product.expiresAt} />}
+                        // 0 means a perpetual license.
+                        value={
+                            product.expiresAt ? (
+                                <ExpiryValue expiresAt={product.expiresAt} />
+                            ) : (
+                                m['common.state.never']()
+                            )
+                        }
                     />
                 </InfoGrid>
             ) : (
                 <StatusBanner product={product} />
             )}
-            <footer className="mt-auto flex justify-end border-t pt-3">
+            <footer className={CARD_FOOTER_CLASS}>
                 <ButtonLink variant="primary" to="/products/$productId" params={{ productId: product.id }}>
                     {m['productsPage.action.viewProduct']()}
                 </ButtonLink>
@@ -263,7 +277,7 @@ function ProductStats({ product }: { product: Product }) {
         <StatTiles
             tiles={[
                 // "0 / 10" already says what it is, so no hint.
-                { label: m['productsPage.card.seats'](), value: seats(product) },
+                { label: m['productsPage.card.seats.label'](), value: seats(product) },
                 {
                     label: m['leaseDuration.label'](),
                     hint: m['productsPage.sections.stats.leaseDuration.hint'](),

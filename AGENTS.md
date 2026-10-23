@@ -26,6 +26,8 @@ Who uses it: the customer's IT admin or ops engineer, activating the server lice
 
 Text wording and capitalization rules are in [messages/AGENTS.md](./messages/AGENTS.md).
 
+- **Capitalization**: every title and button is Title Case: page, section, card, banner and dialog titles, labels, column headers, nav and menu items, status values and button text ("Activate License", "Lease Duration", "Log Out"). Sentence case only for running text: hints, descriptions, toasts, errors and input placeholders.
+
 - **Filters**: list filter properties in alphabetical order. Sort dropdown options alphabetically unless the values have a natural order (e.g. severity, time ranges).
 - **Row/menu actions**, in this order: actions that change the resource (Activate, Deactivate), then actions that don't (e.g. Copy, View), then links to other pages.
 - **Dates and times**: the LFS API returns epoch **seconds**, not ISO strings. Format with `formatDate` from `@cryptlex/web-components/utilities/date` and the helpers in `src/lib/relative-time.ts` / `src/components/expiry-value.tsx`, which follow the viewer's locale via `Intl`; never hardcode a date format.

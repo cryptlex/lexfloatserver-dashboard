@@ -53,7 +53,7 @@
         "products": "Products",
         "devices": "Devices",
         "settings": "Settings",
-        "signOut": "Sign out"
+        "logOut": "Log Out"
     },
     "username": {
         "label": "Username"
@@ -95,10 +95,6 @@
     },
     "key": {
         "label": "License Key"
-    },
-    "allowedFloatingClients": {
-        "label": "Concurrent Seats",
-        "hint": "Devices holding a seat right now, out of the maximum allowed at the same time. A device frees its seat when the app closes or its lease runs out."
     },
     "expiresAt": {
         "label": "Expires",
@@ -144,26 +140,26 @@
         "label": "Port"
     },
     "leaseDuration": {
-        "label": "Lease duration",
+        "label": "Lease Duration",
         "hint": "How long a device keeps a seat between renewals."
     },
     "allowedClockOffset": {
-        "label": "Allowed clock offset",
+        "label": "Allowed Clock Offset",
         "hint": "Allowed clock drift between the server and client."
     },
     "admins": {
-        "label": "Admin users",
+        "label": "Admin Users",
         "hint": "Users who can log in."
     },
     "blockedIps": {
-        "label": "Blocked IP addresses"
+        "label": "Blocked IP Addresses"
     },
     "trustedProxies": {
-        "label": "Trusted proxies",
+        "label": "Trusted Proxies",
         "hint": "Proxies allowed to forward requests."
     },
     "logLevel": {
-        "label": "Log level",
+        "label": "Log Level",
         "debug": {
             "label": "Debug"
         },
@@ -178,29 +174,29 @@
         }
     },
     "consoleLogs": {
-        "label": "Console logging"
+        "label": "Console Logging"
     },
     "fileLogs": {
-        "label": "File logging"
+        "label": "File Logging"
     },
     "logDirectory": {
-        "label": "Log directory"
+        "label": "Log Directory"
     },
     "maxFileSize": {
-        "label": "Max file size",
+        "label": "Max File Size",
         "hint": "Size before a new log file starts."
     },
     "maxBackups": {
-        "label": "Backups kept",
+        "label": "Backups Kept",
         "hint": "Old log files to keep, per product."
     },
     "authPage": {
         "login": {
-            "pageTitle": "Log in",
-            "title": "Log in",
+            "pageTitle": "Log In",
+            "title": "Log In",
             "description": "Use an admin username and password from the licensing server's config.",
             "action": {
-                "submit": "Log in"
+                "submit": "Log In"
             },
             "error": {
                 "invalidCredentials": "Username or password is incorrect."
@@ -212,53 +208,53 @@
         "action": {
             "activate": "Activate",
             "activateLicense": "Activate License",
-            "viewProduct": "View product",
+            "viewProduct": "View Product",
             "deactivate": "Deactivate",
             "sync": "Sync"
         },
         "sections": {
             "licenseDetails": {
-                "title": "License details"
+                "title": "License Details"
             },
             "stats": {
                 "products": {
                     "label": "Products"
                 },
                 "activeDevices": {
-                    "label": "Active devices"
+                    "label": "Active Devices"
                 },
                 "offlineDevices": {
-                    "label": "Offline devices"
+                    "label": "Offline Devices"
                 },
                 "leaseDuration": {
                     "hint": "How long a device keeps a seat between renewals."
                 }
             },
             "meterAttributes": {
-                "title": "Meter attributes",
+                "title": "Meter Attributes",
                 "hint": "Usage limits on this license and current usage."
             },
             "featureEntitlements": {
-                "title": "Feature entitlements",
+                "title": "Feature Entitlements",
                 "hint": "Features this license unlocks."
             },
             "licenseMetadata": {
-                "title": "License metadata",
+                "title": "License Metadata",
                 "hint": "Extra details added to this license."
             },
             "productMetadata": {
-                "title": "Product metadata",
+                "title": "Product Metadata",
                 "hint": "Extra details added to this product."
             }
         },
         "card": {
-            "seats": "Seats"
+            "seats": {
+                "label": "Seats",
+                "hint": "Seats held for this product."
+            },
+            "notActivated": "No license is activated yet."
         },
         "banner": {
-            "notActivated": {
-                "title": "Activate a License for This Product",
-                "description": "No license is activated for this product yet. Until you activate one, devices can't get a seat from the license server."
-            },
             "gracePeriodOver": {
                 "title": "The License Server Needs to Sync",
                 "description": "The license server hasn't synced over the internet for longer than this license allows, so devices can't get a seat. Connect it to the internet and select Sync."
@@ -286,7 +282,7 @@
         "deactivateDialog": {
             "title": "Deactivate {product}?",
             "description": "This server stops handing out seats for this product, and devices using it lose their seats when their leases end. You can activate it again later with the same license key.",
-            "confirmLabel": "Type the license key to confirm",
+            "confirmLabel": "Type the License Key to Confirm",
             "error": {
                 "outstandingOffline": "Some devices still hold offline seats. Wait for their leases to end, or return them, before deactivating.",
                 "keyMismatch": "This doesn't match the license key this product is activated with."
@@ -306,14 +302,14 @@
         "columns": {
             "hostname": "Hostname",
             "product": "Product",
-            "ipAddress": "IP address",
-            "os": "Operating system",
-            "osUser": "OS user",
-            "leaseType": "Lease type",
-            "appVersion": "App version",
-            "leasedAt": "Leased at",
-            "leaseRenewedAt": "Lease renewed at",
-            "leaseExpiresAt": "Lease expires"
+            "ipAddress": "IP Address",
+            "os": "Operating System",
+            "osUser": "OS User",
+            "leaseType": "Lease Type",
+            "appVersion": "App Version",
+            "leasedAt": "Leased",
+            "leaseRenewedAt": "Lease Renewed",
+            "leaseExpiresAt": "Lease Expires"
         },
         "details": {
             "sections": {
@@ -349,7 +345,7 @@
                 "title": "Logging"
             },
             "productDefaults": {
-                "title": "Product defaults",
+                "title": "Product Defaults",
                 "hint": "Used unless a product or license overrides it."
             }
         }
@@ -359,11 +355,11 @@
         "hint": "Yes: activated offline and not synced since."
     },
     "offlineSeats": {
-        "label": "Offline seats",
+        "label": "Offline Seats",
         "hint": "Seats that can be borrowed at once."
     },
     "maxOfflineLeaseDuration": {
-        "label": "Max offline lease duration",
+        "label": "Max Offline Lease Duration",
         "hint": "How long a seat can be borrowed."
     },
     "metadata": {

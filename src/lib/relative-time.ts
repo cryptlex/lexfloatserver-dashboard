@@ -5,14 +5,15 @@ import { m } from '@/paraglide/messages.js';
 
 /**
  * The time is included deliberately: on the final day of a license it matters
- * whether it lapses at 09:00 or 23:59. `formatDate` defaults to including
- * `second: '2-digit'`, which is noise here, so these options override it.
+ * whether it lapses at 09:00 or 23:59. `formatDate` defaults to zero-padded
+ * days and hours plus `second: '2-digit'`, which is noise here, so these
+ * options override it: "Nov 5, 2026, 10:02 AM".
  */
 export const DATE_TIME_OPTIONS: Intl.DateTimeFormatOptions = {
     month: 'short',
-    day: '2-digit',
+    day: 'numeric',
     year: 'numeric',
-    hour: '2-digit',
+    hour: 'numeric',
     minute: '2-digit',
 };
 

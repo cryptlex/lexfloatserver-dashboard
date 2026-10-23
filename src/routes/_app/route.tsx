@@ -81,7 +81,7 @@ function AppLayout() {
                                     navigate({ to: '/login' });
                                 }}
                             >
-                                {m['nav.signOut']()}
+                                {m['nav.logOut']()}
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     </SidebarMenu>
